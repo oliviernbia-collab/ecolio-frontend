@@ -1,0 +1,208 @@
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: #f5f6fa;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c1c9d4; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0aab4; }
+
+/* ─── Keyframes ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shakeX {
+  0%, 100% { transform: translateX(0); }
+  15%       { transform: translateX(-7px); }
+  30%       { transform: translateX(7px); }
+  45%       { transform: translateX(-5px); }
+  60%       { transform: translateX(5px); }
+  75%       { transform: translateX(-3px); }
+  90%       { transform: translateX(3px); }
+}
+@keyframes bounceIn {
+  0%   { opacity: 0; transform: scale(0.35); }
+  55%  { opacity: 1; transform: scale(1.06); }
+  80%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+@keyframes checkmark {
+  0%   { stroke-dashoffset: 50; opacity: 0; }
+  50%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes rowInsert {
+  from { opacity: 0; transform: translateY(-6px); background-color: rgba(46,134,171,0.08); }
+  to   { opacity: 1; transform: translateY(0);    background-color: transparent; }
+}
+
+/* ─── Utility classes ─── */
+.animate-fade-in    { animation: fadeIn    0.3s ease-out both; }
+.animate-fade-in-up { animation: fadeInUp  0.35s ease-out both; }
+.animate-scale-in   { animation: scaleIn   0.3s ease-out both; }
+.animate-bounce-in  { animation: bounceIn  0.5s cubic-bezier(0.215, 0.61, 0.355, 1) both; }
+.animate-shake      { animation: shakeX    0.48s ease-in-out both; }
+.animate-pulse      { animation: pulse     1.6s ease-in-out infinite; }
+.animate-row-insert { animation: rowInsert 0.4s ease-out both; }
+
+/* ─── Stagger pour enfants ─── */
+.stagger > *:nth-child(1) { animation-delay:   0ms; }
+.stagger > *:nth-child(2) { animation-delay:  70ms; }
+.stagger > *:nth-child(3) { animation-delay: 140ms; }
+.stagger > *:nth-child(4) { animation-delay: 210ms; }
+.stagger > *:nth-child(5) { animation-delay: 280ms; }
+.stagger > *:nth-child(6) { animation-delay: 350ms; }
+
+/* ─── Entrée de page ─── */
+.page-enter {
+  animation: fadeInUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Skeleton loader ─── */
+.skeleton {
+  background: linear-gradient(90deg, #e8ecf0 25%, #f4f6f8 50%, #e8ecf0 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+.skeleton-text  { height: 14px; margin: 4px 0; }
+.skeleton-title { height: 20px; margin: 4px 0; }
+.skeleton-avatar { border-radius: 50% !important; }
+
+/* ─── Micro-interactions globales ─── */
+.MuiButton-contained {
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+.MuiButton-contained:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 5px 16px rgba(0,0,0,0.16) !important;
+}
+.MuiButton-contained:active {
+  transform: translateY(0) !important;
+}
+.MuiButton-outlined,
+.MuiButton-text {
+  transition: background-color 0.15s ease, transform 0.12s ease !important;
+}
+.MuiButton-outlined:active,
+.MuiButton-text:active {
+  transform: scale(0.97) !important;
+}
+.MuiCard-root {
+  transition: box-shadow 0.2s ease !important;
+}
+.MuiIconButton-root {
+  transition: transform 0.14s ease, background-color 0.14s ease !important;
+}
+.MuiIconButton-root:hover {
+  transform: scale(1.12) !important;
+}
+.MuiIconButton-root:active {
+  transform: scale(0.96) !important;
+}
+.MuiChip-root {
+  transition: transform 0.14s ease !important;
+}
+.MuiTableRow-body:hover {
+  background-color: rgba(26, 60, 94, 0.03) !important;
+  cursor: default;
+}
+.MuiTableRow-root {
+  transition: background-color 0.15s ease !important;
+}
+.MuiListItemButton-root {
+  transition: background-color 0.15s ease !important;
+}
+.MuiToggleButton-root {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+}
+.MuiTableSortLabel-root {
+  transition: color 0.15s ease !important;
+}
+.MuiTableSortLabel-root:hover {
+  color: #1A3C5E !important;
+}
+
+/* ─── Focus ring sur les inputs ─── */
+.MuiOutlinedInput-root {
+  transition: box-shadow 0.2s ease !important;
+}
+.MuiOutlinedInput-root:hover,
+.MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.10) !important;
+}
+
+/* ─── Dialogs ─── */
+.MuiDialog-paper {
+  animation: scaleIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+/* ─── Snackbar / Toast ─── */
+.MuiSnackbar-root {
+  animation: slideInRight 0.3s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+/* ─── Pagination ─── */
+.MuiTablePagination-root {
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ─── Responsive helpers ─── */
+@media (max-width: 600px) {
+  .hide-xs { display: none !important; }
+  .MuiTableCell-root { padding: 10px 8px !important; font-size: 0.8rem !important; }
+  .MuiTableCell-head { padding: 8px !important; font-size: 0.75rem !important; }
+}
+@media (max-width: 900px) {
+  .hide-sm { display: none !important; }
+}
+
+/* ─── Confirm dialog danger ─── */
+.confirm-danger .MuiDialog-paper {
+  border-top: 3px solid #dc2626;
+}
+
+/* ─── Print (masquer l'UI lors de l'impression directe depuis l'app) ─── */
+@media print {
+  nav, header, aside,
+  .MuiDrawer-root,
+  .MuiAppBar-root,
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .print-only { display: block !important; }
+}

@@ -177,7 +177,7 @@ function EditPayslipDialog({ payslip, onClose, onSaved }: { payslip: Payslip; on
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open onClose={onClose} maxWidth="xs" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Modifier le bulletin — {payslip.first_name} {payslip.last_name}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
@@ -215,7 +215,7 @@ function PayDialog({ payslip, onClose, onPaid }: { payslip: Payslip; onClose: ()
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open onClose={onClose} maxWidth="xs" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Marquer payé — {payslip.first_name} {payslip.last_name}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" mb={1}>Net à payer : <strong>{Number(payslip.net_amount).toLocaleString('fr-FR')} FCFA</strong></Typography>

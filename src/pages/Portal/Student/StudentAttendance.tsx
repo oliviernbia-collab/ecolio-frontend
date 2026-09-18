@@ -50,7 +50,7 @@ export default function StudentAttendance() {
                 {rate}%
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 3 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, sm: 3 } }}>
               {[
                 { label: 'Présences', value: presents, color: '#2ecc71' },
                 { label: 'Absences',  value: absences, color: '#e74c3c' },

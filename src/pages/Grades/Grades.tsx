@@ -300,7 +300,7 @@ function GradeForm({ open, onClose, grade, classes, subjects, classId, onSaved }
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>{grade ? 'Modifier la note' : 'Saisir une note'}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>

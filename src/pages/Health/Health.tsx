@@ -38,7 +38,7 @@ function VisitForm({ open, onClose, students, onSaved }: { open: boolean; onClos
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Nouvelle visite à l'infirmerie</DialogTitle>
       <DialogContent>
         {error && <Box sx={{ color: 'error.main', mb: 2, p: 1.5, bgcolor: '#fff5f5', borderRadius: 1, border: '1px solid #fecaca', fontSize: '0.85rem' }}>{error}</Box>}

@@ -251,7 +251,7 @@ function ClassForm({ open, onClose, cls, teachers, onSaved }: {
   const staffTeachers = teachers.filter(t => ['teacher','director','super_admin','counselor'].includes(t.role))
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle sx={{ fontWeight: 700 }}>
         {cls ? 'Modifier la classe' : 'Nouvelle classe'}
       </DialogTitle>

@@ -69,7 +69,7 @@ function PaymentDialog({ open, invoice, onClose, onPaid }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <FontAwesomeIcon icon={faMobileScreen} style={{ color: ECOLIO_BLUE, fontSize: '1.1rem' }} />
@@ -364,7 +364,11 @@ export default function Finance() {
                     <TableCell>Type</TableCell>
                     <TableCell className="hide-xs">Description</TableCell>
                     <SortCell label="Montant" field="amount" />
-                    <SortCell label="Échéance" field="due_date" />
+                    <TableCell className="hide-xs">
+                      <TableSortLabel active={sortKey === 'due_date'} direction={sortKey === 'due_date' ? sortDir : 'asc'} onClick={() => handleSort('due_date')}>
+                        Échéance
+                      </TableSortLabel>
+                    </TableCell>
                     <SortCell label="Statut" field="status" />
                     <TableCell align="right">Actions</TableCell>
                   </TableRow>
@@ -398,7 +402,7 @@ export default function Finance() {
                             {Number(inv.amount).toLocaleString('fr-FR')} FCFA
                           </Typography>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hide-xs">
                           <Typography variant="caption"
                             sx={{ color: inv.status === 'overdue' ? '#dc2626' : 'text.secondary', fontWeight: inv.status === 'overdue' ? 600 : 400 }}>
                             {inv.due_date ? new Date(inv.due_date).toLocaleDateString('fr-FR') : '—'}
@@ -506,7 +510,7 @@ function InvoiceForm({ open, onClose, onSaved }: { open: boolean; onClose: () =>
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Nouvelle facture</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>

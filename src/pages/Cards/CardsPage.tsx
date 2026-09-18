@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '../../lib/icons'
 import { downloadFile } from '../../lib/download'
 import {
   faIdCard, faIdBadge, faFileText, faPrint, faDownload,
-  faUsers, faCamera, faRefresh
+  faUsers, faCamera, faRefresh, faGraduationCap
 } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { Student, StaffMember, Class } from '../../types'
@@ -17,6 +17,7 @@ import { useToast } from '../../contexts/ToastContext'
 import { printStudentCard, printBulkStudentCards } from './StudentCard'
 import { printStaffBadge, printBulkStaffBadges } from './StaffBadge'
 import { printBulletin } from './BulletinPrint'
+import { printCollante, ExamInfo } from './Collante'
 
 const PERIODS = [
   { value: 'trimestre1', label: '1er Trimestre' },
@@ -113,6 +114,12 @@ export default function CardsPage() {
   const [badgeStaff,   setBadgeStaff]   = useState('')
   const [badgeLoading, setBadgeLoading] = useState(false)
 
+  // Relevé / collante (classes d'examen)
+  const [collStudent, setCollStudent] = useState('')
+  const [collType,    setCollType]    = useState<ExamInfo['type']>('bac')
+  const [collSerie,   setCollSerie]   = useState('')
+  const [collLoading, setCollLoading] = useState(false)
+
   // Chargement initial
   useEffect(() => {
     Promise.all([
@@ -187,6 +194,19 @@ export default function CardsPage() {
         }, school)
       }
     } finally { setBadgeLoading(false) }
+  }
+
+  // ── Relevé / collante ───────────────────────────────────────────────────────
+  const handlePrintCollante = async () => {
+    if (!collStudent || !school) { showToast('Sélectionnez un élève', 'warning'); return }
+    setCollLoading(true)
+    try {
+      const r = await api.get(`/grades/bulletin/${collStudent}`)
+      const { student, subjects, generalAverage } = r.data.data
+      const info: ExamInfo = { type: collType, session: currentYear, serie: collSerie || undefined }
+      await printCollante(student, subjects, generalAverage, school, info)
+    } catch { showToast('Erreur lors de la génération du relevé', 'error') }
+    finally { setCollLoading(false) }
   }
 
   const bullStudents = cardClass
@@ -361,6 +381,52 @@ export default function CardsPage() {
                 Tout le personnel ({staff.length})
               </Button>
             </Box>
+          </SectionCard>
+        </Grid>
+
+        {/* ── Relevé annuel / collante (classes d'examen) ─────────────────────── */}
+        <Grid item xs={12} md={4}>
+          <SectionCard icon={faGraduationCap} color="#7c3aed" bg="#ede9fe" title="Relevé annuel" subtitle="Pour les classes d'examen (BEPC, BAC)">
+            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Élève</InputLabel>
+              <Select value={collStudent} onChange={e => setCollStudent(e.target.value)} label="Élève">
+                <MenuItem value="">— Sélectionner —</MenuItem>
+                {allStudents.filter(s => s.status !== 'archive').map(s => (
+                  <MenuItem key={s.id} value={String(s.id)}>
+                    {s.first_name} {s.last_name}
+                    {s.class_name ? ` (${s.class_name})` : ''}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Type</InputLabel>
+              <Select value={collType} onChange={e => setCollType(e.target.value as ExamInfo['type'])} label="Type">
+                <MenuItem value="bepc">BEPC</MenuItem>
+                <MenuItem value="bac">Baccalauréat</MenuItem>
+                <MenuItem value="generique">Relevé général</MenuItem>
+              </Select>
+            </FormControl>
+
+            {collType === 'bac' && (
+              <TextField fullWidth size="small" label="Série (ex. C, D, A4)" value={collSerie}
+                onChange={e => setCollSerie(e.target.value)} sx={{ mb: 2.5 }} />
+            )}
+
+            <Box sx={{ p: 1.5, bgcolor: '#faf5ff', borderRadius: 1, mb: 2 }}>
+              <Typography variant="caption" color="text.secondary">
+                Document interne basé sur les notes annuelles enregistrées (moyenne, matières,
+                coefficients). Ne remplace pas l'attestation officielle de la DECO.
+              </Typography>
+            </Box>
+
+            <Button variant="contained" fullWidth disabled={!collStudent || collLoading}
+              sx={{ bgcolor: '#7c3aed', '&:hover': { bgcolor: '#6d28d9' } }}
+              startIcon={collLoading ? <CircularProgress size={14} color="inherit" /> : <FontAwesomeIcon icon={faPrint} style={{ fontSize: '0.85rem' }} />}
+              onClick={handlePrintCollante}>
+              Générer le relevé
+            </Button>
           </SectionCard>
         </Grid>
 

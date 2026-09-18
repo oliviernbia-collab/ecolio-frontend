@@ -102,6 +102,7 @@ export default function Settings() {
       <Typography variant="h5" fontWeight={700} mb={3}>Paramètres</Typography>
 
       <Tabs value={tab} onChange={(_, v) => setTab(v)}
+        variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile
         sx={{ mb: 3, '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 } }}>
         <Tab icon={<FontAwesomeIcon icon={faSchool} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="École" />
         <Tab icon={<FontAwesomeIcon icon={faUser}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mon profil" />
@@ -115,8 +116,8 @@ export default function Settings() {
             <Typography variant="subtitle1" fontWeight={600} mb={2.5}>Informations de l'école</Typography>
 
             {/* Logo upload */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Box sx={{ position: 'relative' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+              <Box sx={{ position: 'relative', flexShrink: 0 }}>
                 <Avatar
                   src={school.logo_url || ''}
                   sx={{ width: 72, height: 72, bgcolor: ECOLIO_NAVY, fontSize: '1.5rem', border: '3px solid #e8f0fe' }}
@@ -142,7 +143,7 @@ export default function Settings() {
                 </Tooltip>
                 <input ref={logoInputRef} type="file" accept="image/*" hidden onChange={handleLogoChange} />
               </Box>
-              <Box>
+              <Box sx={{ minWidth: 0, flex: '1 1 200px' }}>
                 <Typography variant="body2" fontWeight={600}>{school.name}</Typography>
                 <Typography variant="caption" color="text.secondary">
                   Cliquez sur l'icône pour changer le logo (JPEG, PNG · max 3 Mo)
@@ -229,7 +230,7 @@ export default function Settings() {
         <Card>
           <CardContent sx={{ p: 3 }}>
             {/* Avatar upload */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 3, flexWrap: 'wrap' }}>
               <Badge
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -263,7 +264,7 @@ export default function Settings() {
               </Badge>
               <input ref={avatarInputRef} type="file" accept="image/*" hidden onChange={handleAvatarChange} />
 
-              <Box>
+              <Box sx={{ minWidth: 0, flex: '1 1 200px' }}>
                 <Typography variant="h6">{user?.first_name} {user?.last_name}</Typography>
                 <Typography variant="caption" color="text.secondary">{user?.email}</Typography>
                 <Typography variant="caption" color="text.secondary" display="block">

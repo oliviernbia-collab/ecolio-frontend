@@ -79,7 +79,7 @@ export default function Register() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             mx: 'auto', mb: 1.5, boxShadow: '0 4px 16px rgba(46,134,171,0.15)'
           }}>
-            <Box component="img" src="/ecolio.png" alt="Écolio" sx={{ height: 52, width: 52, objectFit: 'contain' }} />
+            <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: 52, width: 52, objectFit: 'contain' }} />
           </Box>
           <Typography variant="h5" fontWeight={800} sx={{ color: ECOLIO_NAVY, letterSpacing: -0.5 }}>Écolio</Typography>
           <Typography variant="caption" color="text.secondary">Gestion Scolaire</Typography>

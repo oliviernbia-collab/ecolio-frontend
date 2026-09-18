@@ -44,7 +44,7 @@ function BookForm({ open, onClose, book, onSaved }: { open: boolean; onClose: ()
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>{book ? 'Modifier le livre' : 'Ajouter un livre'}</DialogTitle>
       <DialogContent>
         {error && <Box sx={{ color: 'error.main', mb: 2, p: 1.5, bgcolor: '#fff5f5', borderRadius: 1, border: '1px solid #fecaca', fontSize: '0.85rem' }}>{error}</Box>}
@@ -99,7 +99,7 @@ function LoanForm({ open, onClose, books, students, staff, onSaved }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Nouvel emprunt</DialogTitle>
       <DialogContent>
         {error && <Box sx={{ color: 'error.main', mb: 2, p: 1.5, bgcolor: '#fff5f5', borderRadius: 1, border: '1px solid #fecaca', fontSize: '0.85rem' }}>{error}</Box>}

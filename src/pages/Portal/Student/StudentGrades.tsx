@@ -58,14 +58,14 @@ export default function StudentGrades() {
           <FontAwesomeIcon icon={faBookOpen} style={{ marginRight: 10, color: '#1A3C5E' }} />
           Mes notes
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           {generalAvg != null && (
             <Chip
               label={`Moyenne générale : ${generalAvg.toFixed(2)}/20`}
               sx={{ bgcolor: generalAvg >= 10 ? '#dcfce7' : '#fee2e2', color: generalAvg >= 10 ? '#15803d' : '#dc2626', fontWeight: 700 }}
             />
           )}
-          <TextField select size="small" value={period} onChange={e => setPeriod(e.target.value)} sx={{ minWidth: 180 }}>
+          <TextField select size="small" value={period} onChange={e => setPeriod(e.target.value)} sx={{ minWidth: { xs: '100%', sm: 180 } }}>
             {PERIODS.map(p => <MenuItem key={p.value} value={p.value}>{p.label}</MenuItem>)}
           </TextField>
         </Box>

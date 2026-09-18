@@ -63,7 +63,7 @@ export default function ParentGrades() {
               sx={{ bgcolor: generalAvg >= 10 ? '#dcfce7' : '#fee2e2', color: generalAvg >= 10 ? '#15803d' : '#dc2626', fontWeight: 700 }}
             />
           )}
-          <TextField select size="small" value={period} onChange={e => setPeriod(e.target.value)} sx={{ minWidth: 180 }}>
+          <TextField select size="small" value={period} onChange={e => setPeriod(e.target.value)} sx={{ minWidth: { xs: '100%', sm: 180 } }}>
             {PERIODS.map(p => <MenuItem key={p.value} value={p.value}>{p.label}</MenuItem>)}
           </TextField>
         </Box>

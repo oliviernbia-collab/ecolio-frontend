@@ -1,14 +1,23 @@
 import { useState } from 'react'
 import {
-  Box, Card, TextField, Button, Typography, InputAdornment,
-  IconButton, Alert, CircularProgress
+  Box, TextField, Button, Typography, InputAdornment,
+  IconButton, Alert, CircularProgress, Divider
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faEye, faEyeSlash, faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faEye, faEyeSlash, faLock, faEnvelope, faPlay } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 
+const fieldSx = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '10px',
+    bgcolor: '#f9fafb',
+    '& fieldset': { borderColor: '#e5e7eb' },
+    '&:hover fieldset': { borderColor: '#d1d5db' },
+    '&.Mui-focused fieldset': { borderColor: ECOLIO_BLUE },
+  },
+}
 
 export default function Login() {
   const { login } = useAuth()
@@ -34,111 +43,112 @@ export default function Login() {
   }
 
   return (
-    <Box sx={{
-      minHeight: '100vh',
-      display: 'flex',
-      background: `linear-gradient(135deg, ${ECOLIO_NAVY} 0%, ${ECOLIO_BLUE} 100%)`,
-      position: 'relative', overflow: 'hidden'
-    }}>
-      <Box sx={{ position: 'absolute', top: -100, right: -100, width: 400, height: 400, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-      <Box sx={{ position: 'absolute', bottom: -80, left: -80, width: 300, height: 300, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: '#fff' }}>
+      {/* Left — form */}
+      <Box sx={{
+        flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        px: { xs: 3, sm: 8, md: 10 }, py: 6, maxWidth: { md: 560 },
+      }}>
+        <Typography variant="h4" fontWeight={800} sx={{ color: '#111827', mb: 0.5 }}>
+          Bon retour parmi nous
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Connectez-vous pour accéder à votre espace
+        </Typography>
 
-      {/* Left panel */}
-      <Box sx={{ flex: 1, display: { xs: 'none', md: 'flex' }, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 6, color: 'white' }}>
-        <Box sx={{ mb: 4, textAlign: 'center' }}>
-          {/* Logo dans un badge blanc */}
-          <Box sx={{
-            width: 120, height: 120, borderRadius: '50%',
-            bgcolor: 'white', boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            mx: 'auto', mb: 3
+        {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+
+        <form onSubmit={handleSubmit}>
+          <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Email</Typography>
+          <TextField fullWidth placeholder="votre@email.com" type="email" value={email}
+            onChange={e => setEmail(e.target.value)} sx={{ ...fieldSx, mb: 3 }} autoComplete="email" autoFocus
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.95rem', color: '#9ca3af' }} />
+                </InputAdornment>
+              )
+            }} />
+
+          <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Mot de passe</Typography>
+          <TextField fullWidth placeholder="••••••••" type={showPassword ? 'text' : 'password'} value={password}
+            onChange={e => setPassword(e.target.value)} sx={{ ...fieldSx, mb: 3 }} autoComplete="current-password"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FontAwesomeIcon icon={faLock} style={{ fontSize: '0.95rem', color: '#9ca3af' }} />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} style={{ fontSize: '0.9rem', color: '#9ca3af' }} />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }} />
+
+          <Button type="submit" fullWidth disabled={loading} sx={{
+            py: 1.5, fontSize: '1rem', fontWeight: 700, borderRadius: '10px', color: '#fff', textTransform: 'none',
+            background: `linear-gradient(135deg, ${ECOLIO_NAVY} 0%, ${ECOLIO_BLUE} 100%)`,
+            boxShadow: 'none',
+            '&:hover': { background: 'linear-gradient(135deg, #0f2236 0%, #1e6b8a 100%)', boxShadow: 'none' },
           }}>
-            <Box component="img" src="/ecolio.png" alt="Écolio" sx={{ height: 80, width: 80, objectFit: 'contain' }} />
-          </Box>
-          <Typography variant="h3" fontWeight={800} sx={{ mb: 1, letterSpacing: -1 }}>Écolio</Typography>
-          <Typography variant="h6" sx={{ opacity: 0.8, fontWeight: 300 }}>Application de Gestion Scolaire</Typography>
-        </Box>
-        <Box sx={{ mt: 2, textAlign: 'left', maxWidth: 340 }}>
-          {[
-            'Gestion des élèves & inscriptions',
-            'Notes, bulletins & emploi du temps',
-            'Communication école-famille',
-            'Suivi des présences & finances'
-          ].map(f => (
-            <Box key={f} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.7)', flexShrink: 0 }} />
-              <Typography variant="body1" sx={{ opacity: 0.9 }}>{f}</Typography>
-            </Box>
-          ))}
-        </Box>
+            {loading ? <CircularProgress size={22} color="inherit" /> : 'Se connecter'}
+          </Button>
+        </form>
+
+        <Typography variant="body2" title="Fonctionnalité à venir — contactez votre administrateur"
+          sx={{ textAlign: 'center', mt: 2, color: ECOLIO_BLUE, fontWeight: 600 }}>
+          Mot de passe oublié ?
+        </Typography>
+
+        <Divider sx={{ my: 3, color: 'text.secondary', fontSize: '0.8rem' }}>ou</Divider>
+
+        <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+          Pas encore de compte ?{' '}
+          <Link to="/register" style={{ color: ECOLIO_BLUE, fontWeight: 700, textDecoration: 'none' }}>
+            Inscrivez-vous
+          </Link>
+        </Typography>
       </Box>
 
-      {/* Right panel — Login form */}
-      <Box sx={{ width: { xs: '100%', md: 480 }, display: 'flex', alignItems: 'center', justifyContent: 'center', p: { xs: 2, sm: 4 } }}>
-        <Card sx={{ width: '100%', maxWidth: 420, p: { xs: 3, sm: 4 }, borderRadius: 3, boxShadow: '0 25px 60px rgba(0,0,0,0.2)' }}>
-          <Box sx={{ textAlign: 'center', mb: 3.5 }}>
-            <Box sx={{
-              width: 80, height: 80, borderRadius: '50%',
-              bgcolor: '#f0f4ff', border: `3px solid ${ECOLIO_BLUE}20`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              mx: 'auto', mb: 1.5, boxShadow: '0 4px 16px rgba(46,134,171,0.15)'
-            }}>
-              <Box component="img" src="/ecolio.png" alt="Écolio" sx={{ height: 52, width: 52, objectFit: 'contain' }} />
-            </Box>
-            <Typography variant="h5" fontWeight={800} sx={{ color: ECOLIO_NAVY, letterSpacing: -0.5 }}>Écolio</Typography>
-            <Typography variant="caption" color="text.secondary">Gestion Scolaire</Typography>
+      {/* Right — branding panel */}
+      <Box sx={{
+        display: { xs: 'none', md: 'flex' }, flex: 1, position: 'relative', overflow: 'hidden',
+        flexDirection: 'column', justifyContent: 'center', p: 8, m: 2, ml: 0,
+        borderRadius: '28px',
+        background: `linear-gradient(160deg, ${ECOLIO_NAVY} 0%, #0f2236 100%)`,
+        color: '#fff',
+      }}>
+        <Box sx={{ position: 'absolute', top: -100, right: -80, width: 320, height: 320, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
+        <Box sx={{ position: 'absolute', bottom: -120, left: -60, width: 360, height: 360, borderRadius: '50%', background: 'rgba(46,134,171,0.18)' }} />
+
+        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 1.2, mb: 6 }}>
+          <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: 32, width: 32, objectFit: 'contain' }} />
+          <Typography variant="h6" fontWeight={800}>Écolio</Typography>
+        </Box>
+
+        <Typography variant="h3" fontWeight={800} sx={{ position: 'relative', zIndex: 1, lineHeight: 1.15, mb: 3, maxWidth: 440 }}>
+          Gérez votre école en toute{' '}
+          <Box component="span" sx={{ color: '#5EEAD4' }}>simplicité</Box>
+        </Typography>
+
+        <Typography variant="body1" sx={{ position: 'relative', zIndex: 1, opacity: 0.75, maxWidth: 400, mb: 4 }}>
+          Élèves, notes, présences, finances et communication : tout votre établissement dans une seule application.
+        </Typography>
+
+        <Button component={Link} to="/" variant="outlined" sx={{
+          position: 'relative', zIndex: 1, alignSelf: 'flex-start', borderRadius: '999px',
+          borderColor: 'rgba(255,255,255,0.3)', color: '#fff', textTransform: 'none', fontWeight: 600,
+          px: 3, py: 1, '&:hover': { borderColor: '#fff', bgcolor: 'rgba(255,255,255,0.08)' },
+        }} startIcon={
+          <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FontAwesomeIcon icon={faPlay} style={{ fontSize: '0.65rem' }} />
           </Box>
-
-          <Typography variant="h6" fontWeight={700} color="text.primary" gutterBottom>Connexion</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Accédez à votre espace de gestion scolaire
-          </Typography>
-
-          {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
-
-          <form onSubmit={handleSubmit}>
-            <TextField fullWidth label="Adresse e-mail" type="email" value={email} onChange={e => setEmail(e.target.value)}
-              sx={{ mb: 2 }} autoComplete="email" autoFocus
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.95rem', color: '#9ca3af' }} />
-                  </InputAdornment>
-                )
-              }} />
-
-            <TextField fullWidth label="Mot de passe" type={showPassword ? 'text' : 'password'} value={password}
-              onChange={e => setPassword(e.target.value)} sx={{ mb: 3 }} autoComplete="current-password"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <FontAwesomeIcon icon={faLock} style={{ fontSize: '0.95rem', color: '#9ca3af' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
-                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} style={{ fontSize: '0.95rem' }} />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }} />
-
-            <Button type="submit" variant="contained" fullWidth size="large" disabled={loading}
-              sx={{ py: 1.4, fontSize: '1rem', mb: 2 }}>
-              {loading ? <CircularProgress size={22} color="inherit" /> : 'Se connecter'}
-            </Button>
-          </form>
-
-          <Box sx={{ mt: 3, pt: 2.5, borderTop: '1px solid #f0f0f0', textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Pas encore de compte ?{' '}
-              <Link to="/register" style={{ color: ECOLIO_BLUE, fontWeight: 600, textDecoration: 'none' }}>
-                Inscrire votre école
-              </Link>
-            </Typography>
-          </Box>
-        </Card>
+        }>
+          Découvrir
+        </Button>
       </Box>
     </Box>
   )

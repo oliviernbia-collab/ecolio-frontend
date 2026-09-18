@@ -7,7 +7,8 @@ import { FontAwesomeIcon } from '../../lib/icons'
 import {
   faGraduationCap, faChartLine, faEnvelope, faWallet, faCalendarCheck,
   faSchool, faLocationDot, faNewspaper, faArrowRight, faUsers, faGauge,
-  faShieldHalved, faBolt, faHeadset, faUserPlus, faGear, faListCheck
+  faShieldHalved, faBolt, faHeadset, faUserPlus, faGear, faListCheck,
+  faUserTie, faChalkboardUser, faUserGroup, faChartColumn, faClipboardUser
 } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import api from '../../lib/axios'
@@ -30,6 +31,16 @@ const STEPS = [
   { icon: faUserPlus,   title: 'Inscrivez votre école',   desc: 'Créez votre compte directeur et configurez votre établissement en quelques minutes.' },
   { icon: faGear,       title: 'Ajoutez vos données',      desc: 'Classes, personnel, élèves et emploi du temps : la configuration se fait simplement, étape par étape.' },
   { icon: faListCheck,  title: 'Gérez au quotidien',        desc: 'Notes, présences, finances, examens et communication, depuis un seul endroit, sur ordinateur ou mobile.' },
+]
+
+// Positions en hexagone autour du hub central (coordonnées en % d'un viewBox 0-100)
+const ROLES = [
+  { icon: faUserTie,       label: 'Dirigeants',   color: '#f59e0b', top: 4,  left: 50 },
+  { icon: faChalkboardUser,label: 'Enseignants',  color: '#ea580c', top: 27, left: 91 },
+  { icon: faUserGroup,     label: 'Parents',      color: '#e11d48', top: 73, left: 91 },
+  { icon: faGraduationCap, label: 'Élèves',       color: ECOLIO_BLUE, top: 96, left: 50 },
+  { icon: faChartColumn,   label: 'Comptable',    color: '#64748b', top: 73, left: 9  },
+  { icon: faClipboardUser, label: 'Secrétariat',  color: ECOLIO_NAVY, top: 27, left: 9  },
 ]
 
 const TRUST_POINTS = [
@@ -83,16 +94,16 @@ export default function Landing() {
       {/* ── Header ── */}
       <Box sx={{ borderBottom: '1px solid #eef0f4', bgcolor: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 10 }}>
         <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5, gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
               <Box sx={{
-                width: 44, height: 44, borderRadius: '50%', bgcolor: 'white',
+                width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 }, borderRadius: '50%', bgcolor: 'white',
                 border: `2px solid ${ECOLIO_BLUE}20`, boxShadow: '0 2px 10px rgba(46,134,171,0.15)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
               }}>
-                <Box component="img" src="/ecolio.png" alt="Écolio" sx={{ height: 28, width: 28, objectFit: 'contain' }} />
+                <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: { xs: 22, sm: 28 }, width: { xs: 22, sm: 28 }, objectFit: 'contain' }} />
               </Box>
-              <Typography variant="h6" fontWeight={800} sx={{ color: ECOLIO_NAVY, letterSpacing: -0.5 }}>Écolio</Typography>
+              <Typography variant="h6" fontWeight={800} sx={{ color: ECOLIO_NAVY, letterSpacing: -0.5, display: { xs: 'none', sm: 'block' } }}>Écolio</Typography>
             </Box>
 
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3.5 }}>
@@ -104,12 +115,13 @@ export default function Landing() {
               ))}
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, flexShrink: 0 }}>
               {user ? (
                 <Button component={Link} to="/" variant="contained"
                   startIcon={<FontAwesomeIcon icon={faGauge} style={{ fontSize: '0.8rem' }} />}
                   sx={{
-                    borderRadius: 999, px: 2.5, fontWeight: 700,
+                    borderRadius: 999, px: { xs: 1.5, sm: 2.5 }, fontWeight: 700,
+                    fontSize: { xs: '0.78rem', sm: '0.875rem' },
                     boxShadow: '0 4px 14px rgba(26,60,94,0.25)',
                     '&:hover': { boxShadow: '0 6px 18px rgba(26,60,94,0.32)' },
                   }}>
@@ -117,8 +129,17 @@ export default function Landing() {
                 </Button>
               ) : (
                 <>
-                  <Button component={Link} to="/login" variant="outlined" sx={{ borderRadius: 999 }}>Se connecter</Button>
-                  <Button component={Link} to="/register" variant="contained" sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderRadius: 999, fontWeight: 700 }}>
+                  <Button component={Link} to="/login" variant="outlined" sx={{
+                    borderRadius: 999, px: { xs: 1.5, sm: 2 }, fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                  }}>
+                    Se connecter
+                  </Button>
+                  <Button component={Link} to="/register" variant="outlined" sx={{
+                    borderRadius: 999, fontWeight: 700, px: { xs: 1.5, sm: 2.5 }, fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                    bgcolor: 'white', color: ECOLIO_NAVY, borderColor: ECOLIO_NAVY, borderWidth: 1.5,
+                    boxShadow: '0 2px 10px rgba(26,60,94,0.12)',
+                    '&:hover': { bgcolor: '#f0f4ff', borderColor: ECOLIO_NAVY, borderWidth: 1.5 },
+                  }}>
                     Inscrire votre école
                   </Button>
                 </>
@@ -203,11 +224,68 @@ export default function Landing() {
                   boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
                 }}>
-                  <Box component="img" src="/ecolio.png" alt="" sx={{ width: '58%', objectFit: 'contain' }} />
+                  <Box component="img" src="/Ecolio1.png" alt="" sx={{ width: '58%', objectFit: 'contain' }} />
                 </Box>
               </Box>
             </Grid>
           </Grid>
+        </Container>
+      </Box>
+
+      {/* ── Pour qui ? (hub + 6 acteurs) ── */}
+      <Box sx={{ bgcolor: 'white', borderBottom: '1px solid #eef0f4', py: { xs: 7, md: 9 } }}>
+        <Container maxWidth="lg">
+          <Typography variant="h4" fontWeight={800} textAlign="center" sx={{ mb: 1, color: ECOLIO_NAVY }}>
+            Une plateforme pensée pour tous les acteurs de l'école
+          </Typography>
+          <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ mb: 6, maxWidth: 560, mx: 'auto' }}>
+            Dirigeants, enseignants, secrétariat, comptables, parents et élèves accèdent chacun
+            à leur propre espace, connecté au même établissement.
+          </Typography>
+
+          <Box sx={{
+            width: '100%', maxWidth: 460, mx: 'auto',
+            pt: { xs: 5, sm: 6 }, pb: { xs: 5, sm: 6 },
+          }}>
+            <Box sx={{ position: 'relative', width: '100%', aspectRatio: '1' }}>
+              {/* Connecteurs */}
+              <Box component="svg" viewBox="0 0 100 100" sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}>
+                {ROLES.map(r => (
+                  <line key={r.label} x1={50} y1={50} x2={r.left} y2={r.top} stroke={r.color} strokeWidth={0.8} opacity={0.45} />
+                ))}
+              </Box>
+
+              {/* Hub central */}
+              <Box sx={{
+                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 2,
+                width: { xs: 76, sm: 92 }, height: { xs: 76, sm: 92 }, borderRadius: '50%', bgcolor: 'white',
+                border: `2px solid ${ECOLIO_BLUE}30`, boxShadow: '0 8px 24px rgba(26,60,94,0.18)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 0.3,
+              }}>
+                <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: { xs: 26, sm: 32 }, width: { xs: 26, sm: 32 }, objectFit: 'contain' }} />
+                <Typography sx={{ fontSize: { xs: '0.55rem', sm: '0.65rem' }, fontWeight: 800, color: ECOLIO_NAVY }}>Écolio</Typography>
+              </Box>
+
+              {/* Rôles */}
+              {ROLES.map(r => (
+                <Box key={r.label} sx={{
+                  position: 'absolute', top: `${r.top}%`, left: `${r.left}%`, transform: 'translate(-50%,-50%)',
+                  zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.8, width: 92,
+                }}>
+                  <Box sx={{
+                    width: { xs: 52, sm: 64 }, height: { xs: 52, sm: 64 }, borderRadius: '50%', bgcolor: 'white',
+                    border: `2.5px solid ${r.color}`, boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                    <FontAwesomeIcon icon={r.icon} style={{ fontSize: '1.15rem', color: r.color }} />
+                  </Box>
+                  <Typography sx={{ fontSize: { xs: '0.7rem', sm: '0.78rem' }, fontWeight: 700, color: r.color, textAlign: 'center', whiteSpace: 'nowrap' }}>
+                    {r.label}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
         </Container>
       </Box>
 
@@ -389,7 +467,7 @@ export default function Landing() {
           <Grid container spacing={4}>
             <Grid item xs={12} sm={4}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                <Box component="img" src="/ecolio.png" alt="Écolio" sx={{ height: 28, width: 28, objectFit: 'contain' }} />
+                <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: 28, width: 28, objectFit: 'contain' }} />
                 <Typography variant="subtitle1" fontWeight={800} color="white">Écolio</Typography>
               </Box>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>

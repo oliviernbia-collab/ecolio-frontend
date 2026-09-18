@@ -53,7 +53,7 @@ function SubjectForm({ open, onClose, subject, classes, teachers, onSaved }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>{subject ? 'Modifier la matière' : 'Ajouter une matière'}</DialogTitle>
       <DialogContent>
         {error && (

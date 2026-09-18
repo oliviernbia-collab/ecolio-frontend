@@ -64,7 +64,7 @@ function SelfServiceView() {
         <Typography variant="h5" fontWeight={700}>Pointage</Typography>
         <Typography variant="body2" color="text.secondary">{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Typography>
       </Box>
-      <Card sx={{ p: 4, textAlign: 'center', maxWidth: 480, mx: 'auto' }}>
+      <Card sx={{ p: { xs: 2, sm: 4 }, textAlign: 'center', maxWidth: 480, mx: 'auto' }}>
         {loading ? <CircularProgress /> : (
           <>
             <FontAwesomeIcon icon={faFingerprint} style={{ fontSize: '3rem', color: ECOLIO_BLUE, opacity: 0.4, marginBottom: 16 }} />
@@ -82,7 +82,7 @@ function SelfServiceView() {
                 </Typography>
               </Grid>
             </Grid>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center' }}>
               <Button variant="contained" size="large" disabled={busy || !!record?.check_in_time}
                 startIcon={<FontAwesomeIcon icon={faRightToBracket} />} onClick={handleCheckIn}
                 sx={{ bgcolor: '#16a34a', '&:hover': { bgcolor: '#15803d' } }}>

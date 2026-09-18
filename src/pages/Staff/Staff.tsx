@@ -56,7 +56,7 @@ export default function Staff() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 3, gap: 2, flexWrap: 'wrap' }}>
         <Box>
           <Typography variant="h5" fontWeight={700}>Personnel</Typography>
           <Typography variant="body2" color="text.secondary">{staff.length} membre(s)</Typography>
@@ -138,7 +138,8 @@ export default function Staff() {
         onSaved={() => { load(); }} />
 
       {/* Dialog confirmation suppression */}
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth>
+      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth
+        fullScreen={window.innerWidth < 600}>
         <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <FontAwesomeIcon icon={faTrash} style={{ fontSize: '0.9rem', color: '#dc2626' }} />
@@ -191,15 +192,16 @@ function StaffForm({ open, onClose, member, onSaved }: { open: boolean; onClose:
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth
+      fullScreen={window.innerWidth < 600}>
       <DialogTitle>{member ? 'Modifier' : 'Ajouter un membre du personnel'}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
-          <Grid item xs={6}><TextField fullWidth label="Prénom *" value={form.first_name} onChange={e => set('first_name', e.target.value)} /></Grid>
-          <Grid item xs={6}><TextField fullWidth label="Nom *" value={form.last_name} onChange={e => set('last_name', e.target.value)} /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label="Prénom *" value={form.first_name} onChange={e => set('first_name', e.target.value)} /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label="Nom *" value={form.last_name} onChange={e => set('last_name', e.target.value)} /></Grid>
           <Grid item xs={12}><TextField fullWidth label="Email *" type="email" value={form.email} onChange={e => set('email', e.target.value)} disabled={!!member} /></Grid>
-          <Grid item xs={6}><TextField fullWidth label="Téléphone" value={form.phone || ''} onChange={e => set('phone', e.target.value)} /></Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}><TextField fullWidth label="Téléphone" value={form.phone || ''} onChange={e => set('phone', e.target.value)} /></Grid>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <InputLabel>Rôle</InputLabel>
               <Select value={form.role} onChange={e => set('role', e.target.value)} label="Rôle">
@@ -207,8 +209,8 @@ function StaffForm({ open, onClose, member, onSaved }: { open: boolean; onClose:
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}><TextField fullWidth label="Poste" value={form.position || ''} onChange={e => set('position', e.target.value)} /></Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} sm={6}><TextField fullWidth label="Poste" value={form.position || ''} onChange={e => set('position', e.target.value)} /></Grid>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <InputLabel>Contrat</InputLabel>
               <Select value={form.contract_type} onChange={e => set('contract_type', e.target.value)} label="Contrat">
@@ -216,8 +218,8 @@ function StaffForm({ open, onClose, member, onSaved }: { open: boolean; onClose:
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6}><TextField fullWidth label="Date d'embauche" type="date" value={form.hire_date || ''} onChange={e => set('hire_date', e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
-          <Grid item xs={6}><TextField fullWidth label="Salaire (FCFA)" type="number" value={form.salary || ''} onChange={e => set('salary', e.target.value)} /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label="Date d'embauche" type="date" value={form.hire_date || ''} onChange={e => set('hire_date', e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
+          <Grid item xs={12} sm={6}><TextField fullWidth label="Salaire (FCFA)" type="number" value={form.salary || ''} onChange={e => set('salary', e.target.value)} /></Grid>
           {!member && <Grid item xs={12}><TextField fullWidth label="Mot de passe" type="password" value={form.password} onChange={e => set('password', e.target.value)} helperText="Laissez vide pour le mot de passe par défaut (Ecolio1234!)" /></Grid>}
         </Grid>
       </DialogContent>

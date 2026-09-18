@@ -64,7 +64,7 @@ function YearForm({ open, onClose, year, onSaved }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>{year ? 'Modifier l\'année' : 'Nouvelle année scolaire'}</DialogTitle>
       <DialogContent>
         {error && (

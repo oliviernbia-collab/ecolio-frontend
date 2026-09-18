@@ -235,7 +235,7 @@ function ComposeDialog({ open, onClose, onSent }: { open: boolean; onClose: () =
   const selectedGroupData = groups.find(g => g.id === selectedGroup)
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle sx={{ borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
         Nouveau message
       </DialogTitle>

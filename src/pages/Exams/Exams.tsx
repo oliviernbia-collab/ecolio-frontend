@@ -78,11 +78,11 @@ export default function Exams() {
               <TableHead>
                 <TableRow>
                   <TableCell>Titre</TableCell>
-                  <TableCell>Classe</TableCell>
+                  <TableCell className="hide-xs">Classe</TableCell>
                   <TableCell>Matière</TableCell>
                   <TableCell>Date</TableCell>
                   <TableCell className="hide-xs">Horaire</TableCell>
-                  <TableCell className="hide-xs">Salle</TableCell>
+                  <TableCell className="hide-sm">Salle</TableCell>
                   <TableCell>Statut</TableCell>
                   <TableCell align="right">Actions</TableCell>
                 </TableRow>
@@ -93,11 +93,11 @@ export default function Exams() {
                   return (
                     <TableRow key={e.id} hover>
                       <TableCell><Typography variant="body2" fontWeight={500}>{e.title}</Typography></TableCell>
-                      <TableCell>{e.class_name}</TableCell>
+                      <TableCell className="hide-xs">{e.class_name}</TableCell>
                       <TableCell>{e.subject_name}</TableCell>
                       <TableCell>{new Date(e.exam_date).toLocaleDateString('fr-FR')}</TableCell>
                       <TableCell className="hide-xs">{e.start_time?.substring(0, 5)}–{e.end_time?.substring(0, 5)}</TableCell>
-                      <TableCell className="hide-xs">{e.room_name || '—'}</TableCell>
+                      <TableCell className="hide-sm">{e.room_name || '—'}</TableCell>
                       <TableCell><Chip label={st.label} size="small" sx={{ bgcolor: st.bg, color: st.color, fontWeight: 600 }} /></TableCell>
                       <TableCell align="right">
                         <IconButton size="small" onClick={() => setGradesTarget(e)} title="Saisir les notes">
@@ -157,7 +157,7 @@ function ExamForm({ open, onClose, classes, subjects, rooms, onSaved }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Planifier un examen</DialogTitle>
       <DialogContent>
         {error && <Typography color="error" variant="caption" display="block" mb={1}>{error}</Typography>}
@@ -250,13 +250,14 @@ function ExamGradesDialog({ exam, onClose, onSaved }: { exam: Exam; onClose: () 
   }
 
   return (
-    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Notes — {exam.title}</DialogTitle>
       <DialogContent>
         {loading ? (
           <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>
         ) : (
-          <Table size="small">
+          <TableContainer sx={{ overflowX: 'auto' }}>
+          <Table size="small" sx={{ minWidth: 340 }}>
             <TableHead>
               <TableRow><TableCell>Élève</TableCell><TableCell align="right" sx={{ width: 120 }}>Note /{exam.max_value}</TableCell></TableRow>
             </TableHead>
@@ -278,6 +279,7 @@ function ExamGradesDialog({ exam, onClose, onSaved }: { exam: Exam; onClose: () 
               ))}
             </TableBody>
           </Table>
+          </TableContainer>
         )}
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>

@@ -71,7 +71,7 @@ export default function Schedule() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 3, gap: 2, flexWrap: 'wrap' }}>
         <Box>
           <Typography variant="h5" fontWeight={700}>Emploi du temps</Typography>
           <Typography variant="body2" color="text.secondary">Planning hebdomadaire</Typography>
@@ -84,8 +84,8 @@ export default function Schedule() {
       </Box>
 
       <Card sx={{ mb: 2 }}>
-        <Box sx={{ p: 2 }}>
-          <FormControl size="small" sx={{ minWidth: 200 }}>
+        <Box sx={{ p: 2, display: 'flex', flexWrap: 'wrap' }}>
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 } }}>
             <InputLabel>Classe</InputLabel>
             <Select value={classId} onChange={e => setClassId(e.target.value)} label="Classe">
               <MenuItem value="">Sélectionner une classe</MenuItem>
@@ -208,7 +208,7 @@ function ScheduleForm({ open, onClose, classId, subjects, onSaved }: {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle>Ajouter un créneau</DialogTitle>
       <DialogContent>
         {error && <Typography color="error" variant="caption" display="block" mb={1}>{error}</Typography>}

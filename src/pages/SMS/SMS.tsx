@@ -153,7 +153,7 @@ function ComposeSmsDialog({ open, onClose, onSent }: { open: boolean; onClose: (
   const segments = Math.max(1, Math.ceil(content.length / SMS_SEGMENT_LENGTH))
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={window.innerWidth < 600}>
       <DialogTitle sx={{ borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>Nouveau SMS</DialogTitle>
       <DialogContent sx={{ pt: 2.5 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>

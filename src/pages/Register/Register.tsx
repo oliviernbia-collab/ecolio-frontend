@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
   Box, Card, TextField, Button, Typography, InputAdornment,
-  IconButton, Alert, CircularProgress, Grid, Stepper, Step, StepLabel
+  Alert, CircularProgress, Grid, Stepper, Step, StepLabel
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faEye, faEyeSlash, faLock, faEnvelope, faUser, faSchool, faPhone, faArrowLeft, faArrowRight, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faEnvelope, faUser, faSchool, faPhone, faArrowLeft, faArrowRight, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../../lib/axios'
+import PasswordField from '../../components/ui/PasswordField'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 
 const STEPS = ['Votre école', 'Votre compte', 'Confirmation']
@@ -14,7 +15,6 @@ const STEPS = ['Votre école', 'Votre compte', 'Confirmation']
 export default function Register() {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
-  const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(false)
@@ -155,15 +155,14 @@ export default function Register() {
                     InputProps={{ startAdornment: <InputAdornment position="start"><FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.9rem', color: '#9ca3af' }} /></InputAdornment> }} />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField fullWidth label="Mot de passe *" type={showPwd ? 'text' : 'password'} value={account.password} onChange={e => setA('password', e.target.value)}
+                  <PasswordField fullWidth label="Mot de passe *" value={account.password} onChange={e => setA('password', e.target.value)}
                     helperText="Minimum 8 caractères"
                     InputProps={{
                       startAdornment: <InputAdornment position="start"><FontAwesomeIcon icon={faLock} style={{ fontSize: '0.9rem', color: '#9ca3af' }} /></InputAdornment>,
-                      endAdornment: <InputAdornment position="end"><IconButton size="small" onClick={() => setShowPwd(p => !p)}><FontAwesomeIcon icon={showPwd ? faEyeSlash : faEye} style={{ fontSize: '0.9rem' }} /></IconButton></InputAdornment>
                     }} />
                 </Grid>
                 <Grid item xs={12}>
-                  <TextField fullWidth label="Confirmer le mot de passe *" type="password" value={account.confirm} onChange={e => setA('confirm', e.target.value)}
+                  <PasswordField fullWidth label="Confirmer le mot de passe *" value={account.confirm} onChange={e => setA('confirm', e.target.value)}
                     error={!!account.confirm && account.confirm !== account.password}
                     helperText={account.confirm && account.confirm !== account.password ? 'Ne correspond pas' : ''}
                     InputProps={{ startAdornment: <InputAdornment position="start"><FontAwesomeIcon icon={faLock} style={{ fontSize: '0.9rem', color: '#9ca3af' }} /></InputAdornment> }} />

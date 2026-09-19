@@ -12,6 +12,7 @@ import { StaffMember } from '../../types'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
 import CredentialsDialog, { Credential } from '../../components/ui/CredentialsDialog'
+import PasswordField from '../../components/ui/PasswordField'
 
 const roleLabels: Record<string, string> = {
   director:    'Directeur',
@@ -232,7 +233,7 @@ function StaffForm({ open, onClose, member, onSaved, onCredentials }: {
           </Grid>
           <Grid item xs={12} sm={6}><TextField fullWidth label="Date d'embauche" type="date" value={form.hire_date || ''} onChange={e => set('hire_date', e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
           <Grid item xs={12} sm={6}><TextField fullWidth label="Salaire (FCFA)" type="number" value={form.salary || ''} onChange={e => set('salary', e.target.value)} /></Grid>
-          {!member && <Grid item xs={12}><TextField fullWidth label="Mot de passe" type="password" value={form.password} onChange={e => set('password', e.target.value)} helperText="Laissez vide pour générer un mot de passe temporaire aléatoire" /></Grid>}
+          {!member && <Grid item xs={12}><PasswordField fullWidth label="Mot de passe" value={form.password} onChange={e => set('password', e.target.value)} helperText="Laissez vide pour générer un mot de passe temporaire aléatoire" /></Grid>}
         </Grid>
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>

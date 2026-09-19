@@ -130,7 +130,9 @@ export default function AcademicYears() {
       await api.put(`/academic-years/${y.id}/current`)
       showToast(`"${y.name}" définie comme année active`, 'success')
       load()
-    } catch { showToast('Erreur', 'error') }
+    } catch (e: any) {
+      showToast(e.response?.data?.message || "Erreur lors de l'activation", 'error')
+    }
     finally { setActionLoading(false); setConfirmActive(null) }
   }
 
@@ -140,7 +142,9 @@ export default function AcademicYears() {
       await api.put(`/academic-years/${y.id}/close`)
       showToast(`"${y.name}" clôturée`, 'success')
       load()
-    } catch { showToast('Erreur', 'error') }
+    } catch (e: any) {
+      showToast(e.response?.data?.message || 'Erreur lors de la clôture', 'error')
+    }
     finally { setActionLoading(false); setConfirmClose(null) }
   }
 

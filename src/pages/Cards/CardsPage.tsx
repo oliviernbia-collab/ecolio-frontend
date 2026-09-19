@@ -54,7 +54,9 @@ function StudentPhotoCell({ student, onUpdated }: { student: Student; onUpdated:
       const r = await api.post(`/uploads/student/${student.id}`, fd)
       onUpdated(r.data.url)
       showToast('Photo mise à jour', 'success')
-    } catch { showToast('Erreur upload', 'error') }
+    } catch (e: any) {
+      showToast(e.response?.data?.message || "Erreur lors de l'envoi de la photo", 'error')
+    }
     finally { setLoading(false); if (inputRef.current) inputRef.current.value = '' }
   }
 

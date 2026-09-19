@@ -60,6 +60,25 @@ export interface PublicSchool {
   primary_color?: string
 }
 
+export interface PublicSchoolDetail extends PublicSchool {
+  address?: string
+  phone?: string
+  email?: string
+  secondary_color?: string
+}
+
+export interface Publication {
+  id: number
+  school_id: number
+  type: 'image' | 'video' | 'announcement' | 'other'
+  title?: string | null
+  content?: string | null
+  media_url?: string | null
+  media_type?: string | null
+  created_by_name?: string
+  created_at: string
+}
+
 export interface Student {
   id: number
   school_id: number

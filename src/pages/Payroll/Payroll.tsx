@@ -70,7 +70,7 @@ export default function Payroll() {
 
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {[
-          { label: 'Masse salariale', value: `${Math.round(totalNet / 1000)}k FCFA`, color: ECOLIO_NAVY, bg: '#f0f4ff' },
+          { label: 'Masse salariale', value: `${Math.round(totalNet).toLocaleString('fr-FR')} FCFA`, color: ECOLIO_NAVY, bg: '#f0f4ff' },
           { label: 'Bulletins', value: payslips.length, color: '#2E86AB', bg: '#dbeafe' },
           { label: 'Payés', value: `${paidCount}/${payslips.length}`, color: '#16a34a', bg: '#dcfce7' },
         ].map(s => (

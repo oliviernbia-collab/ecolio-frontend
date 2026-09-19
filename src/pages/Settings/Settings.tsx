@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
 import SubscriptionPanel from '../../components/Subscription/SubscriptionPanel'
+import PasswordField from '../../components/ui/PasswordField'
 
 export default function Settings() {
   const { user, updateUser } = useAuth()
@@ -311,14 +312,14 @@ export default function Settings() {
           <CardContent sx={{ p: 3 }}>
             <Typography variant="subtitle1" fontWeight={600} mb={2.5}>Changer le mot de passe</Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <TextField fullWidth label="Mot de passe actuel" type="password"
+              <PasswordField fullWidth label="Mot de passe actuel"
                 value={pwd.current_password}
                 onChange={e => setPwd({ ...pwd, current_password: e.target.value })} />
-              <TextField fullWidth label="Nouveau mot de passe" type="password"
+              <PasswordField fullWidth label="Nouveau mot de passe"
                 value={pwd.new_password}
                 onChange={e => setPwd({ ...pwd, new_password: e.target.value })}
                 helperText="Minimum 8 caractères" />
-              <TextField fullWidth label="Confirmer le mot de passe" type="password"
+              <PasswordField fullWidth label="Confirmer le mot de passe"
                 value={pwd.confirm}
                 onChange={e => setPwd({ ...pwd, confirm: e.target.value })}
                 error={!!pwd.confirm && pwd.confirm !== pwd.new_password}

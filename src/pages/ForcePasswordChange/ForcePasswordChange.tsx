@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { Box, Card, CardContent, Typography, Button, TextField, Alert } from '@mui/material'
+import { Box, Card, CardContent, Typography, Button, Alert } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
+import PasswordField from '../../components/ui/PasswordField'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 
 export default function ForcePasswordChange() {
   const { updateUser, logout } = useAuth()
+  const { showToast } = useToast()
   const [pwd, setPwd] = useState({ current_password: '', new_password: '', confirm: '' })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -19,6 +22,7 @@ export default function ForcePasswordChange() {
     setSaving(true)
     try {
       await api.put('/auth/change-password', { current_password: pwd.current_password, new_password: pwd.new_password })
+      showToast('Mot de passe changé avec succès', 'success')
       updateUser({ must_change_password: false })
     } catch (e: any) {
       setError(e.response?.data?.message || 'Erreur lors du changement de mot de passe')
@@ -39,14 +43,14 @@ export default function ForcePasswordChange() {
           </Typography>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           <Box display="flex" flexDirection="column" gap={2}>
-            <TextField fullWidth label="Mot de passe actuel" type="password"
+            <PasswordField fullWidth label="Mot de passe actuel"
               value={pwd.current_password}
               onChange={e => setPwd({ ...pwd, current_password: e.target.value })} />
-            <TextField fullWidth label="Nouveau mot de passe" type="password"
+            <PasswordField fullWidth label="Nouveau mot de passe"
               value={pwd.new_password}
               onChange={e => setPwd({ ...pwd, new_password: e.target.value })}
               helperText="Minimum 8 caractères" />
-            <TextField fullWidth label="Confirmer le mot de passe" type="password"
+            <PasswordField fullWidth label="Confirmer le mot de passe"
               value={pwd.confirm}
               onChange={e => setPwd({ ...pwd, confirm: e.target.value })}
               error={!!pwd.confirm && pwd.confirm !== pwd.new_password}

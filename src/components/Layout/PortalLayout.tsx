@@ -96,7 +96,7 @@ export default function PortalLayout() {
 
           {/* Avatar menu */}
           <IconButton onClick={e => setAnchorEl(e.currentTarget)} sx={{ p: 0.5 }}>
-            <Avatar sx={{ width: 34, height: 34, bgcolor: '#2E86AB', fontSize: '0.85rem' }}>
+            <Avatar src={user?.avatar_url || ''} sx={{ width: 34, height: 34, bgcolor: '#2E86AB', fontSize: '0.85rem' }}>
               {user?.first_name?.[0]}{user?.last_name?.[0]}
             </Avatar>
           </IconButton>

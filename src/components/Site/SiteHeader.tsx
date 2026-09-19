@@ -3,8 +3,8 @@ import {
   Box, Container, Typography, Button, IconButton, Drawer, Divider, List, ListItemButton
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faGauge, faBars, faXmark, faTrophy } from '@fortawesome/free-solid-svg-icons'
-import { Link, useLocation } from 'react-router-dom'
+import { faGauge, faBars, faXmark, faTrophy, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -23,9 +23,16 @@ const NAV_LINK_SX = {
 // (ex. tableau d'honneur) — mêmes liens, mêmes boutons, même style, pour que ces
 // pages se sentent comme faisant partie du même site plutôt que des pages isolées.
 export default function SiteHeader() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const handleLogout = () => {
+    setMobileOpen(false)
+    logout()
+    navigate('/')
+  }
   // Pour un visiteur, "/" affiche la page d'accueil publique. Pour un utilisateur
   // connecté, "/" affiche l'espace de gestion (tableau de bord) — la page d'accueil
   // se trouve alors sur "/accueil". Les liens d'ancrage doivent pointer vers la bonne
@@ -33,25 +40,44 @@ export default function SiteHeader() {
   const homePath = user ? '/accueil' : '/'
 
   const authAction = user ? (
-    <Button component={Link} to="/" variant="contained" fullWidth
-      startIcon={<FontAwesomeIcon icon={faGauge} style={{ fontSize: '0.8rem' }} />}
-      sx={{
-        borderRadius: 999, px: { xs: 1.5, sm: 2.5 }, fontWeight: 700,
-        fontSize: { xs: '0.78rem', sm: '0.875rem' },
-        boxShadow: '0 4px 14px rgba(26,60,94,0.25)',
-        '&:hover': { boxShadow: '0 6px 18px rgba(26,60,94,0.32)' },
-      }}>
-      Retour au tableau de bord
-    </Button>
+    <>
+      <Button component={Link} to="/" variant="contained" size="small" fullWidth
+        startIcon={<FontAwesomeIcon icon={faGauge} style={{ fontSize: '0.7rem' }} />}
+        sx={{
+          borderRadius: 999, px: { xs: 1, sm: 1.25 }, py: 0.5, fontWeight: 700,
+          fontSize: { xs: '0.7rem', sm: '0.78rem' }, whiteSpace: 'nowrap',
+          boxShadow: '0 4px 14px rgba(26,60,94,0.25)',
+          transition: 'transform 0.15s, box-shadow 0.15s',
+          '& .MuiButton-startIcon': { transition: 'transform 0.15s' },
+          '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 6px 18px rgba(26,60,94,0.32)' },
+          '&:hover .MuiButton-startIcon': { transform: 'translateX(-2px)' },
+        }}>
+        Tableau de bord
+      </Button>
+      <Button onClick={handleLogout} variant="outlined" size="small" fullWidth
+        startIcon={<FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: '0.7rem' }} />}
+        sx={{
+          borderRadius: 999, px: { xs: 1.25, sm: 1.5 }, py: 0.5,
+          fontSize: { xs: '0.7rem', sm: '0.78rem' }, whiteSpace: 'nowrap',
+          color: 'text.secondary', borderColor: '#dde2ea', bgcolor: 'transparent',
+          transition: 'color 0.15s, border-color 0.15s, background-color 0.15s',
+          '& .MuiButton-startIcon': { transition: 'transform 0.15s' },
+          '&:hover': { color: 'error.main', borderColor: 'error.main', bgcolor: 'rgba(231,76,60,0.06)' },
+          '&:hover .MuiButton-startIcon': { transform: 'translateX(2px)' },
+        }}>
+        Déconnexion
+      </Button>
+    </>
   ) : (
     <>
-      <Button component={Link} to="/login" variant="outlined" fullWidth sx={{
-        borderRadius: 999, px: { xs: 1.5, sm: 2 }, fontSize: { xs: '0.78rem', sm: '0.875rem' },
+      <Button component={Link} to="/login" variant="outlined" size="small" fullWidth sx={{
+        borderRadius: 999, px: { xs: 1.25, sm: 1.5 }, py: 0.5, fontSize: { xs: '0.7rem', sm: '0.78rem' },
       }}>
         Se connecter
       </Button>
-      <Button component={Link} to="/register" variant="outlined" fullWidth sx={{
-        borderRadius: 999, fontWeight: 700, px: { xs: 1.5, sm: 2.5 }, fontSize: { xs: '0.78rem', sm: '0.875rem' },
+      <Button component={Link} to="/register" variant="outlined" size="small" fullWidth sx={{
+        borderRadius: 999, fontWeight: 700, px: { xs: 1.25, sm: 1.75 }, py: 0.5,
+        fontSize: { xs: '0.7rem', sm: '0.78rem' }, whiteSpace: 'nowrap',
         bgcolor: 'white', color: ECOLIO_NAVY, borderColor: ECOLIO_NAVY, borderWidth: 1.5,
         boxShadow: '0 2px 10px rgba(26,60,94,0.12)',
         '&:hover': { bgcolor: '#f0f4ff', borderColor: ECOLIO_NAVY, borderWidth: 1.5 },
@@ -91,7 +117,14 @@ export default function SiteHeader() {
             </Typography>
           </Box>
 
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1.5, flexShrink: 0 }}>
+          <Box sx={{
+            display: { xs: 'none', md: 'flex' }, gap: 1, flexShrink: 0,
+            // fullWidth (nécessaire pour l'empilement du menu mobile ci-dessous) devient
+            // un flex-basis de 100% pour CHAQUE bouton dans cette rangée horizontale —
+            // sans ce reset, les deux boutons se disputent 100% de la largeur et
+            // débordent hors de l'écran. Ici on revient à une largeur basée sur le contenu.
+            '& > .MuiButtonBase-root': { width: 'auto', flexShrink: 0 },
+          }}>
             {authAction}
           </Box>
 

@@ -223,7 +223,9 @@ export default function Library() {
     try {
       await api.put(`/library/loans/${loan.id}/return`, { lost })
       showToast(lost ? 'Livre marqué perdu' : 'Livre rendu', 'success'); load()
-    } catch { showToast('Erreur', 'error') }
+    } catch (e: any) {
+      showToast(e.response?.data?.message || 'Erreur lors de la mise à jour du prêt', 'error')
+    }
   }
 
   const filteredBooks = useMemo(() => {

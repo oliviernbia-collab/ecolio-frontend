@@ -89,7 +89,7 @@ export default function Header({ onMenuClick, sidebarWidth }: HeaderProps) {
               sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', borderRadius: 2, px: 1, py: 0.5, '&:hover': { bgcolor: '#f5f6fa' } }}
               onClick={e => setAnchorEl(e.currentTarget)}
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: ECOLIO_NAVY, fontSize: '0.8rem' }}>
+              <Avatar src={user?.avatar_url || ''} sx={{ width: 32, height: 32, bgcolor: ECOLIO_NAVY, fontSize: '0.8rem' }}>
                 {user?.first_name?.[0]}{user?.last_name?.[0]}
               </Avatar>
               <Box sx={{ display: { xs: 'none', sm: 'block' } }}>

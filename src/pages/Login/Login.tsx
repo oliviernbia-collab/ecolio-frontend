@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
   Box, TextField, Button, Typography, InputAdornment,
-  IconButton, Alert, CircularProgress, Divider
+  Alert, CircularProgress, Divider
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faEye, faEyeSlash, faLock, faEnvelope, faPlay } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faEnvelope, faPlay } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
+import PasswordField from '../../components/ui/PasswordField'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 
 const fieldSx = {
@@ -24,7 +25,6 @@ export default function Login() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -71,7 +71,7 @@ export default function Login() {
             }} />
 
           <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Mot de passe</Typography>
-          <TextField fullWidth placeholder="••••••••" type={showPassword ? 'text' : 'password'} value={password}
+          <PasswordField fullWidth placeholder="••••••••" value={password}
             onChange={e => setPassword(e.target.value)} sx={{ ...fieldSx, mb: 3 }} autoComplete="current-password"
             InputProps={{
               startAdornment: (
@@ -79,13 +79,6 @@ export default function Login() {
                   <FontAwesomeIcon icon={faLock} style={{ fontSize: '0.95rem', color: '#9ca3af' }} />
                 </InputAdornment>
               ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
-                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} style={{ fontSize: '0.9rem', color: '#9ca3af' }} />
-                  </IconButton>
-                </InputAdornment>
-              )
             }} />
 
           <Button type="submit" fullWidth disabled={loading} sx={{

@@ -178,7 +178,9 @@ export default function Services() {
     try {
       await api.put(`/services/subscriptions/${sub.id}`, { status, end_date: status === 'termine' ? new Date().toISOString().split('T')[0] : null })
       showToast('Abonnement mis à jour', 'success'); load()
-    } catch { showToast('Erreur', 'error') }
+    } catch (e: any) {
+      showToast(e.response?.data?.message || "Erreur lors de la mise à jour de l'abonnement", 'error')
+    }
   }
 
   const cantineServices = useMemo(() => services.filter(s => s.type === 'cantine'), [services])

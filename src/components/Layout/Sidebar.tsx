@@ -10,7 +10,7 @@ import {
   faIdBadge, faWallet, faEnvelope, faGear, faChevronLeft, faBars,
   faGraduationCap, faAddressCard, faChalkboard, faXmark, faBookOpen, faUserGroup,
   faFileSignature, faFingerprint, faMoneyBillWave, faCommentSms, faHouse,
-  faBook, faBriefcaseMedical, faBus, faGlobe, faMagnifyingGlass, faClockRotateLeft, faTrophy, faUsersGear
+  faBook, faBriefcaseMedical, faBus, faGlobe, faMagnifyingGlass, faClockRotateLeft, faTrophy, faUsersGear, faNewspaper
 } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
@@ -44,6 +44,7 @@ const navItems: NavItem[] = [
 
   { path: '/messages',        label: 'Messagerie',       icon: faEnvelope,      section: 'Communication',      roles: ['super_admin','director','teacher','parent','student','counselor','librarian','nurse','maintenance','secretary'] },
   { path: '/sms',             label: 'Services SMS',     icon: faCommentSms,    section: 'Communication',      roles: ['super_admin','director','secretary'] },
+  { path: '/publications',    label: 'Publications',     icon: faNewspaper,     section: 'Communication',      roles: ['super_admin','director'] },
 
   { path: '/library',         label: 'Bibliothèque',     icon: faBook,          section: 'Ressources',         roles: ['super_admin','director','librarian','teacher','secretary'] },
   { path: '/health',          label: 'Infirmerie',       icon: faBriefcaseMedical, section: 'Ressources',      roles: ['super_admin','director','nurse'] },

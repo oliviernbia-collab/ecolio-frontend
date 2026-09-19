@@ -129,13 +129,13 @@ function DirectorDashboard({ data }: { data: any }) {
             <CardContent sx={{ p: 2.5 }}>
               <Typography variant="subtitle1" fontWeight={600} mb={2}>Finances</Typography>
               <Typography variant="h5" fontWeight={700} color={ECOLIO_NAVY} mb={0.5}>
-                {(data.finance.collected / 1000).toFixed(0)}k <Typography component="span" variant="caption">FCFA collectés</Typography>
+                {Number(data.finance.collected).toLocaleString('fr-FR')} <Typography component="span" variant="caption">FCFA collectés</Typography>
               </Typography>
               <LinearProgress variant="determinate" value={collectedRate}
                 sx={{ height: 8, borderRadius: 4, mb: 1.5, bgcolor: '#fef3c7', '& .MuiLinearProgress-bar': { bgcolor: ECOLIO_BLUE } }} />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="caption" color="text.secondary">Collecté: <b>{collectedRate}%</b></Typography>
-                <Typography variant="caption" color="error">En attente: {(data.finance.pending / 1000).toFixed(0)}k FCFA</Typography>
+                <Typography variant="caption" color="error">En attente: {Number(data.finance.pending).toLocaleString('fr-FR')} FCFA</Typography>
               </Box>
             </CardContent>
           </Card>
@@ -463,10 +463,10 @@ function AccountantDashboard({ data }: { data: any }) {
   return (
     <>
       <Grid container spacing={2.5} sx={{ mb: 3 }}>
-        <Grid item xs={6} sm={3}><StatCard title="Total facturé" value={`${Math.round(counters.total/1000)}k F`} icon={faWallet} color={ECOLIO_NAVY} subtitle="FCFA" /></Grid>
-        <Grid item xs={6} sm={3}><StatCard title="Collecté" value={`${Math.round(counters.collected/1000)}k F`} icon={faCircleCheck} color="#2ecc71" subtitle={`${counters.paid_count} paiements`} /></Grid>
-        <Grid item xs={6} sm={3}><StatCard title="En attente" value={`${Math.round(counters.pending/1000)}k F`} icon={faUserClock} color="#d97706" subtitle={`${counters.pending_count} factures`} /></Grid>
-        <Grid item xs={6} sm={3}><StatCard title="En retard" value={`${Math.round(counters.overdue/1000)}k F`} icon={faTriangleExclamation} color="#e74c3c" subtitle={`${counters.overdue_count} factures`} trend={counters.overdue_count > 0 ? 'À relancer' : 'RAS'} to="/finance" /></Grid>
+        <Grid item xs={6} sm={3}><StatCard title="Total facturé" value={`${Math.round(counters.total).toLocaleString('fr-FR')} F`} icon={faWallet} color={ECOLIO_NAVY} subtitle="FCFA" /></Grid>
+        <Grid item xs={6} sm={3}><StatCard title="Collecté" value={`${Math.round(counters.collected).toLocaleString('fr-FR')} F`} icon={faCircleCheck} color="#2ecc71" subtitle={`${counters.paid_count} paiements`} /></Grid>
+        <Grid item xs={6} sm={3}><StatCard title="En attente" value={`${Math.round(counters.pending).toLocaleString('fr-FR')} F`} icon={faUserClock} color="#d97706" subtitle={`${counters.pending_count} factures`} /></Grid>
+        <Grid item xs={6} sm={3}><StatCard title="En retard" value={`${Math.round(counters.overdue).toLocaleString('fr-FR')} F`} icon={faTriangleExclamation} color="#e74c3c" subtitle={`${counters.overdue_count} factures`} trend={counters.overdue_count > 0 ? 'À relancer' : 'RAS'} to="/finance" /></Grid>
       </Grid>
 
       <Grid container spacing={2.5}>
@@ -479,7 +479,7 @@ function AccountantDashboard({ data }: { data: any }) {
                   <BarChart data={trendData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="mois" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `${Math.round(v/1000)}k`} />
+                    <YAxis tick={{ fontSize: 11 }} width={70} tickFormatter={v => Math.round(v).toLocaleString('fr-FR')} />
                     <ChartTooltip formatter={(v: any) => [`${parseInt(v).toLocaleString('fr-FR')} FCFA`]} />
                     <Bar dataKey="Collecté" fill={ECOLIO_BLUE} radius={[4, 4, 0, 0]} />
                   </BarChart>

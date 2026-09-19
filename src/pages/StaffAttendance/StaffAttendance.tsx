@@ -119,7 +119,9 @@ function AdminView() {
       await api.post('/staff-attendance/bulk', { date, records: [{ staff_id: staffId, status }] })
       showToast('Pointage mis à jour', 'success')
       load()
-    } catch { showToast('Erreur lors de la mise à jour', 'error') }
+    } catch (e: any) {
+      showToast(e.response?.data?.message || 'Erreur lors de la mise à jour', 'error')
+    }
   }
 
   const stats = {

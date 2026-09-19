@@ -387,8 +387,9 @@ export default function Landing() {
             <Grid container spacing={3} className="stagger">
               {schools.map(s => (
                 <Grid item xs={12} sm={6} md={4} key={s.id} className="animate-fade-in-up">
-                  <Card sx={{
+                  <Card component={Link} to={`/ecoles/${s.id}`} sx={{
                     p: 3, display: 'flex', alignItems: 'center', gap: 2, borderRadius: 3,
+                    textDecoration: 'none', color: 'inherit', cursor: 'pointer',
                     transition: 'transform 0.2s, box-shadow 0.2s',
                     '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 14px 28px rgba(0,0,0,0.08)' },
                   }}>

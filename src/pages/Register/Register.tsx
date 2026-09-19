@@ -93,7 +93,7 @@ export default function Register() {
             </Box>
             <Typography variant="h6" fontWeight={700} gutterBottom>Inscription réussie !</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Votre école a bien été créée. Vous pouvez maintenant vous connecter avec vos identifiants.
+              Votre école a bien été créée, avec 30 jours d'essai gratuit. Vous pouvez maintenant vous connecter avec vos identifiants.
             </Typography>
             <Button variant="contained" fullWidth size="large" onClick={() => navigate('/login')}
               sx={{ py: 1.4 }}>

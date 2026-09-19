@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react'
 import {
   Box, Container, Typography, Button, Grid, Card, Avatar, Chip,
-  FormControl, InputLabel, Select, MenuItem, CircularProgress, Divider
+  FormControl, InputLabel, Select, MenuItem, CircularProgress
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
 import {
   faGraduationCap, faChartLine, faEnvelope, faWallet, faCalendarCheck,
-  faSchool, faLocationDot, faNewspaper, faArrowRight, faUsers, faGauge,
+  faSchool, faLocationDot, faNewspaper, faArrowRight, faUsers,
   faShieldHalved, faBolt, faHeadset, faUserPlus, faGear, faListCheck,
-  faUserTie, faChalkboardUser, faUserGroup, faChartColumn, faClipboardUser
+  faUserTie, faChalkboardUser, faUserGroup, faChartColumn, faClipboardUser,
+  faTrophy, faMedal
 } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import api from '../../lib/axios'
-import { PublicSchool } from '../../types'
+import { PublicSchool, PublicTopStudent } from '../../types'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useAuth } from '../../contexts/AuthContext'
+import SiteHeader from '../../components/Site/SiteHeader'
+import SiteFooter from '../../components/Site/SiteFooter'
 
 const FEATURE_COLORS = ['#1A3C5E', '#2E86AB', '#16a34a', '#d97706', '#7c3aed', '#0ea5e9']
 
@@ -42,6 +45,8 @@ const ROLES = [
   { icon: faChartColumn,   label: 'Comptable',    color: '#64748b', top: 73, left: 9  },
   { icon: faClipboardUser, label: 'Secrétariat',  color: ECOLIO_NAVY, top: 27, left: 9  },
 ]
+
+const HERO_IMAGES = ['/Exam.jpg', '/ecole.jpg']
 
 const TRUST_POINTS = [
   { icon: faShieldHalved, label: 'Données sécurisées' },
@@ -76,6 +81,17 @@ export default function Landing() {
   const [cities, setCities] = useState<string[]>([])
   const [city, setCity] = useState('')
   const [loading, setLoading] = useState(true)
+  const [heroImgIndex, setHeroImgIndex] = useState(0)
+  const [topStudents, setTopStudents] = useState<PublicTopStudent[]>([])
+
+  useEffect(() => {
+    api.get('/public/top-students', { params: { limit: 6 } }).then(r => setTopStudents(r.data.data)).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    const id = setInterval(() => setHeroImgIndex(i => (i + 1) % HERO_IMAGES.length), 3000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     api.get('/public/cities').then(r => setCities(r.data.data)).catch(() => {})
@@ -91,69 +107,25 @@ export default function Landing() {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#fafbfc' }}>
-      {/* ── Header ── */}
-      <Box sx={{ borderBottom: '1px solid #eef0f4', bgcolor: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 10 }}>
-        <Container maxWidth="lg">
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5, gap: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
-              <Box sx={{
-                width: { xs: 36, sm: 44 }, height: { xs: 36, sm: 44 }, borderRadius: '50%', bgcolor: 'white',
-                border: `2px solid ${ECOLIO_BLUE}20`, boxShadow: '0 2px 10px rgba(46,134,171,0.15)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0,
-              }}>
-                <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: { xs: 22, sm: 28 }, width: { xs: 22, sm: 28 }, objectFit: 'contain' }} />
-              </Box>
-              <Typography variant="h6" fontWeight={800} sx={{ color: ECOLIO_NAVY, letterSpacing: -0.5, display: { xs: 'none', sm: 'block' } }}>Écolio</Typography>
-            </Box>
-
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3.5 }}>
-              {[{ id: 'fonctionnalites', label: 'Fonctionnalités' }, { id: 'actualites', label: 'Actualités' }, { id: 'ecoles', label: 'Écoles partenaires' }].map(l => (
-                <Typography key={l.id} component="a" href={`#${l.id}`}
-                  sx={{ color: 'text.secondary', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500, cursor: 'pointer', '&:hover': { color: ECOLIO_BLUE } }}>
-                  {l.label}
-                </Typography>
-              ))}
-            </Box>
-
-            <Box sx={{ display: 'flex', gap: { xs: 0.75, sm: 1.5 }, flexShrink: 0 }}>
-              {user ? (
-                <Button component={Link} to="/" variant="contained"
-                  startIcon={<FontAwesomeIcon icon={faGauge} style={{ fontSize: '0.8rem' }} />}
-                  sx={{
-                    borderRadius: 999, px: { xs: 1.5, sm: 2.5 }, fontWeight: 700,
-                    fontSize: { xs: '0.78rem', sm: '0.875rem' },
-                    boxShadow: '0 4px 14px rgba(26,60,94,0.25)',
-                    '&:hover': { boxShadow: '0 6px 18px rgba(26,60,94,0.32)' },
-                  }}>
-                  Retour au tableau de bord
-                </Button>
-              ) : (
-                <>
-                  <Button component={Link} to="/login" variant="outlined" sx={{
-                    borderRadius: 999, px: { xs: 1.5, sm: 2 }, fontSize: { xs: '0.78rem', sm: '0.875rem' },
-                  }}>
-                    Se connecter
-                  </Button>
-                  <Button component={Link} to="/register" variant="outlined" sx={{
-                    borderRadius: 999, fontWeight: 700, px: { xs: 1.5, sm: 2.5 }, fontSize: { xs: '0.78rem', sm: '0.875rem' },
-                    bgcolor: 'white', color: ECOLIO_NAVY, borderColor: ECOLIO_NAVY, borderWidth: 1.5,
-                    boxShadow: '0 2px 10px rgba(26,60,94,0.12)',
-                    '&:hover': { bgcolor: '#f0f4ff', borderColor: ECOLIO_NAVY, borderWidth: 1.5 },
-                  }}>
-                    Inscrire votre école
-                  </Button>
-                </>
-              )}
-            </Box>
-          </Box>
-        </Container>
-      </Box>
+      <SiteHeader />
 
       {/* ── Hero ── */}
       <Box sx={{
-        background: `linear-gradient(135deg, ${ECOLIO_NAVY} 0%, ${ECOLIO_BLUE} 100%)`, color: 'white',
+        color: 'white', bgcolor: ECOLIO_NAVY,
         py: { xs: 7, md: 10 }, position: 'relative', overflow: 'hidden',
       }}>
+        {/* Diaporama photo en arrière-plan (défile toutes les 3s) */}
+        {HERO_IMAGES.map((src, i) => (
+          <Box key={src} component="img" src={src} alt="" sx={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover',
+            opacity: i === heroImgIndex ? 1 : 0, transition: 'opacity 1.2s ease',
+          }} />
+        ))}
+        {/* Voile dégradé pour garder le texte lisible */}
+        <Box sx={{
+          position: 'absolute', inset: 0,
+          background: `linear-gradient(135deg, ${ECOLIO_NAVY}e6 0%, ${ECOLIO_BLUE}cc 100%)`,
+        }} />
         <Box sx={{ position: 'absolute', top: -120, right: -100, width: 420, height: 420, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
         <Box sx={{ position: 'absolute', bottom: -100, left: -80, width: 320, height: 320, borderRadius: '50%', background: 'rgba(255,255,255,0.04)' }} />
         <Container maxWidth="lg" sx={{ position: 'relative' }}>
@@ -173,10 +145,10 @@ export default function Landing() {
                 {user ? (
                   <Button component={Link} to="/" variant="contained" size="large"
                     sx={{
-                      bgcolor: 'white', color: ECOLIO_NAVY, px: 4, py: 1.3, borderRadius: 999, fontWeight: 700,
+                      color: 'white', px: 4, py: 1.3, borderRadius: 999, fontWeight: 700,
                       boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
                       transition: 'transform 0.15s, box-shadow 0.15s',
-                      '&:hover': { bgcolor: '#f0f4ff', transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(0,0,0,0.22)' },
+                      '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(0,0,0,0.22)' },
                       '& .MuiButton-endIcon': { transition: 'transform 0.15s' },
                       '&:hover .MuiButton-endIcon': { transform: 'translateX(3px)' },
                     }}
@@ -187,10 +159,10 @@ export default function Landing() {
                   <>
                     <Button component={Link} to="/register" variant="contained" size="large"
                       sx={{
-                        bgcolor: 'white', color: ECOLIO_NAVY, px: 4, py: 1.3, borderRadius: 999, fontWeight: 700,
+                        color: 'white', px: 4, py: 1.3, borderRadius: 999, fontWeight: 700,
                         boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
                         transition: 'transform 0.15s, box-shadow 0.15s',
-                        '&:hover': { bgcolor: '#f0f4ff', transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(0,0,0,0.22)' },
+                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(0,0,0,0.22)' },
                         '& .MuiButton-endIcon': { transition: 'transform 0.15s' },
                         '&:hover .MuiButton-endIcon': { transform: 'translateX(3px)' },
                       }}
@@ -438,6 +410,36 @@ export default function Landing() {
         </Container>
       </Box>
 
+      {/* ── Tableau d'honneur ── */}
+      {topStudents.length > 0 && (
+        <Box sx={{ py: { xs: 6, md: 9 } }}>
+          <Container maxWidth="lg">
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2, flexWrap: 'wrap', mb: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <FontAwesomeIcon icon={faTrophy} style={{ fontSize: '1.3rem', color: '#d97706' }} />
+                <Typography variant="h4" fontWeight={800} sx={{ color: ECOLIO_NAVY }}>Tableau d'honneur</Typography>
+              </Box>
+              <Button component={Link} to="/tableau-honneur" variant="outlined" endIcon={<FontAwesomeIcon icon={faArrowRight} style={{ fontSize: '0.75rem' }} />}>
+                Voir le tableau complet
+              </Button>
+            </Box>
+            <Grid container spacing={3} className="stagger">
+              {topStudents.map(e => (
+                <Grid item xs={12} sm={6} md={4} key={e.id} className="animate-fade-in-up">
+                  <Card sx={{ p: 2.5, display: 'flex', alignItems: 'center', gap: 1.5, borderRadius: 3 }}>
+                    <FontAwesomeIcon icon={faMedal} style={{ fontSize: '1.3rem', color: '#d97706', flexShrink: 0 }} />
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="subtitle2" fontWeight={700} noWrap>{e.student_name}</Typography>
+                      <Typography variant="caption" color="text.secondary" noWrap display="block">{e.level} — {e.school_name}</Typography>
+                    </Box>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Box>
+      )}
+
       {/* ── CTA final ── */}
       {!user && (
         <Box sx={{ background: `linear-gradient(135deg, ${ECOLIO_BLUE} 0%, ${ECOLIO_NAVY} 100%)`, color: 'white', py: { xs: 6, md: 8 } }}>
@@ -450,9 +452,8 @@ export default function Landing() {
             </Typography>
             <Button component={Link} to="/register" variant="contained" size="large"
               sx={{
-                bgcolor: 'white', color: ECOLIO_NAVY, px: 4.5, py: 1.4, borderRadius: 999, fontWeight: 700,
+                color: 'white', px: 4.5, py: 1.4, borderRadius: 999, fontWeight: 700,
                 boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-                '&:hover': { bgcolor: '#f0f4ff' },
               }}
               endIcon={<FontAwesomeIcon icon={faArrowRight} style={{ fontSize: '0.8rem' }} />}>
               Inscrire votre école gratuitement
@@ -461,53 +462,7 @@ export default function Landing() {
         </Box>
       )}
 
-      {/* ── Footer ── */}
-      <Box sx={{ bgcolor: ECOLIO_NAVY, color: 'rgba(255,255,255,0.7)', py: 5 }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={4}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                <Box component="img" src="/Ecolio1.png" alt="Écolio" sx={{ height: 28, width: 28, objectFit: 'contain' }} />
-                <Typography variant="subtitle1" fontWeight={800} color="white">Écolio</Typography>
-              </Box>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                La plateforme de gestion scolaire tout-en-un pour les établissements maternels, primaires et secondaires.
-              </Typography>
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <Typography variant="subtitle2" color="white" fontWeight={700} mb={1.5}>Navigation</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography component="a" href="#fonctionnalites" variant="body2" sx={{ color: 'inherit', textDecoration: 'none', opacity: 0.8, '&:hover': { opacity: 1 } }}>Fonctionnalités</Typography>
-                <Typography component="a" href="#actualites" variant="body2" sx={{ color: 'inherit', textDecoration: 'none', opacity: 0.8, '&:hover': { opacity: 1 } }}>Actualités</Typography>
-                <Typography component="a" href="#ecoles" variant="body2" sx={{ color: 'inherit', textDecoration: 'none', opacity: 0.8, '&:hover': { opacity: 1 } }}>Écoles partenaires</Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <Typography variant="subtitle2" color="white" fontWeight={700} mb={1.5}>Accès</Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {user ? (
-                  <Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    <Typography variant="body2" sx={{ opacity: 0.8, '&:hover': { opacity: 1 } }}>Retour au tableau de bord</Typography>
-                  </Link>
-                ) : (
-                  <>
-                    <Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>
-                      <Typography variant="body2" sx={{ opacity: 0.8, '&:hover': { opacity: 1 } }}>Se connecter</Typography>
-                    </Link>
-                    <Link to="/register" style={{ color: 'inherit', textDecoration: 'none' }}>
-                      <Typography variant="body2" sx={{ opacity: 0.8, '&:hover': { opacity: 1 } }}>Inscrire votre école</Typography>
-                    </Link>
-                  </>
-                )}
-              </Box>
-            </Grid>
-          </Grid>
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)', my: 3 }} />
-          <Typography variant="body2" sx={{ opacity: 0.6, textAlign: { xs: 'center', sm: 'left' } }}>
-            © {new Date().getFullYear()} Écolio — Gestion scolaire
-          </Typography>
-        </Container>
-      </Box>
+      <SiteFooter />
     </Box>
   )
 }

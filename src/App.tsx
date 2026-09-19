@@ -20,6 +20,7 @@ import Messages from './pages/Messages/Messages'
 import Settings from './pages/Settings/Settings'
 import AcademicYears from './pages/AcademicYears/AcademicYears'
 import CardsPage from './pages/Cards/CardsPage'
+import ActivityLog from './pages/ActivityLog/ActivityLog'
 import Classes from './pages/Classes/Classes'
 import Subjects from './pages/Subjects/Subjects'
 import Parents from './pages/Parents/Parents'
@@ -28,6 +29,9 @@ import StaffAttendance from './pages/StaffAttendance/StaffAttendance'
 import Payroll from './pages/Payroll/Payroll'
 import SMS from './pages/SMS/SMS'
 import ForcePasswordChange from './pages/ForcePasswordChange/ForcePasswordChange'
+import SubscriptionExpired from './pages/Subscription/SubscriptionExpired'
+import TopStudents from './pages/TopStudents/TopStudents'
+import HonorRoll from './pages/HonorRoll/HonorRoll'
 import Library from './pages/Library/Library'
 import Health from './pages/Health/Health'
 import Services from './pages/Services/Services'
@@ -64,16 +68,21 @@ function AppRoutes() {
   if (!user) {
     return (
       <Routes>
-        <Route path="/"         element={<Landing />} />
-        <Route path="/login"    element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="*"         element={<Navigate to="/" replace />} />
+        <Route path="/"                element={<Landing />} />
+        <Route path="/login"           element={<Login />} />
+        <Route path="/register"        element={<Register />} />
+        <Route path="/tableau-honneur" element={<HonorRoll />} />
+        <Route path="*"                element={<Navigate to="/" replace />} />
       </Routes>
     )
   }
 
   if (user.must_change_password) {
     return <ForcePasswordChange />
+  }
+
+  if (user.subscription && !user.subscription.active) {
+    return <SubscriptionExpired />
   }
 
   // Portail Élève
@@ -112,9 +121,10 @@ function AppRoutes() {
   // Espace Admin / Staff
   return (
     <Routes>
-      <Route path="/login"    element={<Navigate to="/" replace />} />
-      <Route path="/register" element={<Navigate to="/" replace />} />
-      <Route path="/accueil"  element={<Landing />} />
+      <Route path="/login"           element={<Navigate to="/" replace />} />
+      <Route path="/register"        element={<Navigate to="/" replace />} />
+      <Route path="/accueil"         element={<Landing />} />
+      <Route path="/tableau-honneur" element={<HonorRoll />} />
       <Route path="/" element={<Layout />}>
         <Route index                  element={<Dashboard />} />
         <Route path="students"        element={<Students />} />
@@ -126,6 +136,8 @@ function AppRoutes() {
         <Route path="messages"        element={<Messages />} />
         <Route path="settings"        element={<Settings />} />
         <Route path="academic-years"  element={<AcademicYears />} />
+        <Route path="activity-log"    element={<ActivityLog />} />
+        <Route path="top-students"    element={<TopStudents />} />
         <Route path="cards"           element={<CardsPage />} />
         <Route path="classes"         element={<Classes />} />
         <Route path="subjects"        element={<Subjects />} />

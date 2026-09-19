@@ -13,6 +13,30 @@ export interface User {
   secondary_color?: string
   school_logo?: string
   must_change_password?: boolean | number
+  subscription?: SubscriptionState | null
+}
+
+export interface SubscriptionState {
+  active: boolean
+  status: 'trial' | 'active' | 'expired'
+  daysLeft: number
+  trialEndsAt: string | null
+  paidUntil: string | null
+}
+
+export interface SubscriptionPayment {
+  id: number
+  school_id?: number
+  school_name?: string
+  amount: number
+  wave_number: string
+  proof_url: string
+  reference: string | null
+  status: 'pending' | 'approved' | 'rejected'
+  submitted_at: string
+  submitted_by_name?: string
+  reviewed_at?: string | null
+  review_note?: string | null
 }
 
 export interface School {
@@ -65,6 +89,7 @@ export interface Student {
 export interface Class {
   id: number
   school_id: number
+  academic_year_id?: number | null
   name: string
   level?: string
   cycle: 'maternelle' | 'primaire' | 'secondaire'
@@ -379,4 +404,53 @@ export interface DashboardStats {
   finance: { total: number; collected: number; pending: number }
   classAverages: Array<{ class_name: string; average: number }>
   recentAbsences: Array<{ date: string; status: string; student_name: string; class_name: string; justified: boolean }>
+}
+
+export interface ActivityLog {
+  id: number
+  school_id: number | null
+  school_name?: string
+  user_id: number | null
+  user_name: string | null
+  user_role: string | null
+  action: string
+  entity_type: string
+  entity_id: number | null
+  description: string | null
+  ip_address: string | null
+  created_at: string
+}
+
+export interface TopStudent {
+  id: number
+  school_id: number
+  academic_year_id: number
+  academic_year_name?: string
+  period: string
+  level: string
+  cycle: 'maternelle' | 'primaire' | 'secondaire'
+  class_id: number | null
+  class_name?: string
+  student_id: number
+  student_name?: string
+  matricule?: string
+  average?: number | null
+  mention?: string | null
+  created_at: string
+}
+
+export interface PublicTopStudent {
+  id: number
+  period: string
+  level: string
+  cycle: 'maternelle' | 'primaire' | 'secondaire'
+  average?: number | null
+  mention?: string | null
+  student_name: string
+  academic_year_name: string
+  school_id: number
+  school_name: string
+  school_city?: string
+  school_logo?: string
+  primary_color?: string
 }

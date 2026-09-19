@@ -4,11 +4,12 @@ import {
   CircularProgress, Avatar, Tabs, Tab, IconButton, Tooltip, Badge, Switch, FormControlLabel
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faFloppyDisk, faSchool, faUser, faLock, faCamera, faImage } from '@fortawesome/free-solid-svg-icons'
+import { faFloppyDisk, faSchool, faUser, faLock, faCamera, faImage, faCreditCard } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { useAuth } from '../../contexts/AuthContext'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
+import SubscriptionPanel from '../../components/Subscription/SubscriptionPanel'
 
 export default function Settings() {
   const { user, updateUser } = useAuth()
@@ -107,6 +108,9 @@ export default function Settings() {
         <Tab icon={<FontAwesomeIcon icon={faSchool} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="École" />
         <Tab icon={<FontAwesomeIcon icon={faUser}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mon profil" />
         <Tab icon={<FontAwesomeIcon icon={faLock}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mot de passe" />
+        {user?.school_id && (
+          <Tab icon={<FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Abonnement" />
+        )}
       </Tabs>
 
       {/* ── Onglet École ─────────────────────────────────────────────────────── */}
@@ -327,6 +331,16 @@ export default function Settings() {
                 {saving ? <CircularProgress size={18} /> : 'Modifier'}
               </Button>
             </Box>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── Onglet Abonnement ────────────────────────────────────────────────── */}
+      {tab === 3 && user?.school_id && (
+        <Card>
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="subtitle1" fontWeight={600} mb={2.5}>Abonnement</Typography>
+            <SubscriptionPanel />
           </CardContent>
         </Card>
       )}

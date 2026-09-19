@@ -61,7 +61,7 @@ function StudentForm({ open, onClose, student, classes, onSaved }: {
   const { showToast } = useToast()
 
   const emptyStudent = {
-    first_name: '', last_name: '', birth_date: '', birth_place: '', gender: 'M',
+    first_name: '', last_name: '', matricule: '', birth_date: '', birth_place: '', gender: 'M',
     class_id: '', status: 'inscrit', address: '', emergency_contact_name: '',
     emergency_contact_phone: '', blood_type: '', medical_notes: '',
   }
@@ -176,6 +176,11 @@ function StudentForm({ open, onClose, student, classes, onSaved }: {
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Nom *" value={form.last_name} onChange={e => set('last_name', e.target.value)} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField fullWidth label="Matricule" value={form.matricule || ''} onChange={e => set('matricule', e.target.value)}
+              placeholder="Ex : ECO-0013"
+              helperText={student ? '' : 'Laissez vide pour une génération automatique'} />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField fullWidth label="Date de naissance" type="date" value={form.birth_date}

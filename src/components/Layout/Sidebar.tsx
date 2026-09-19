@@ -10,7 +10,7 @@ import {
   faIdBadge, faWallet, faEnvelope, faGear, faChevronLeft, faBars,
   faGraduationCap, faAddressCard, faChalkboard, faXmark, faBookOpen, faUserGroup,
   faFileSignature, faFingerprint, faMoneyBillWave, faCommentSms, faHouse,
-  faBook, faBriefcaseMedical, faBus, faGlobe, faMagnifyingGlass
+  faBook, faBriefcaseMedical, faBus, faGlobe, faMagnifyingGlass, faClockRotateLeft, faTrophy
 } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
@@ -48,7 +48,9 @@ const navItems: NavItem[] = [
   { path: '/health',          label: 'Infirmerie',       icon: faBriefcaseMedical, section: 'Ressources',      roles: ['super_admin','director','nurse'] },
 
   { path: '/academic-years',  label: 'Années scolaires', icon: faGraduationCap, section: 'Administration',     roles: ['super_admin','director'] },
+  { path: '/top-students',    label: "Tableau d'honneur",icon: faTrophy,        section: 'Administration',     roles: ['super_admin','director'] },
   { path: '/cards',           label: 'Cartes & Badges',  icon: faAddressCard,   section: 'Administration',     roles: ['super_admin','director','secretary'] },
+  { path: '/activity-log',    label: "Journal d'activité",icon: faClockRotateLeft, section: 'Administration',  roles: ['super_admin','director'] },
   { path: '/settings',        label: 'Paramètres',       icon: faGear,          section: 'Administration',     roles: ['super_admin','director'] },
 ]
 
@@ -188,10 +190,12 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
         {/* Navigation — scrollable, groupée par section */}
         <List sx={{ px: 1, py: 1.5, flex: 1, overflowY: 'auto', overflowX: 'hidden',
-          '&::-webkit-scrollbar': { width: 6 },
-          '&::-webkit-scrollbar-track': { background: 'transparent' },
-          '&::-webkit-scrollbar-thumb': { background: 'rgba(255,255,255,0.15)', borderRadius: 2 },
-          '&::-webkit-scrollbar-thumb:hover': { background: 'rgba(255,255,255,0.28)' },
+          '&::-webkit-scrollbar': { width: 8 },
+          '&::-webkit-scrollbar-track': { background: 'rgba(255,255,255,0.06)', borderRadius: 4 },
+          '&::-webkit-scrollbar-thumb': { background: ECOLIO_BLUE, borderRadius: 4 },
+          '&::-webkit-scrollbar-thumb:hover': { background: '#5ba3c3' },
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${ECOLIO_BLUE} rgba(255,255,255,0.06)`,
         }}>
           {grouped.length === 0 && (
             <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', textAlign: 'center', mt: 2 }}>

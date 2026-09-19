@@ -25,6 +25,20 @@ const PERIODS = [
   { value: 'trimestre3', label: '3ème Trimestre' },
 ]
 
+// Texte blanc lisible (au lieu du gris quasi invisible par défaut de MUI) sur les boutons désactivés
+const DISABLED_BTN_SX = {
+  '&.Mui-disabled': { bgcolor: `${ECOLIO_NAVY}59`, color: 'rgba(255,255,255,0.75)' },
+}
+
+// Scrollbar visible pour les listes déroulantes (élèves / personnel)
+const SCROLL_BOX_SX = {
+  '&::-webkit-scrollbar': { width: 8 },
+  '&::-webkit-scrollbar-track': { background: '#f1f3f6', borderRadius: 4 },
+  '&::-webkit-scrollbar-thumb': { background: `${ECOLIO_BLUE}99`, borderRadius: 4, '&:hover': { background: ECOLIO_BLUE } },
+  scrollbarWidth: 'thin' as const,
+  scrollbarColor: `${ECOLIO_BLUE}99 #f1f3f6`,
+}
+
 // ── Photo upload mini-component ───────────────────────────────────────────────
 function StudentPhotoCell({ student, onUpdated }: { student: Student; onUpdated: (url: string) => void }) {
   const { showToast } = useToast()
@@ -262,7 +276,7 @@ export default function CardsPage() {
 
             {/* Liste des élèves de la classe avec upload photo */}
             {cardClass && students.length > 0 && (
-              <Box sx={{ mb: 2, maxHeight: 180, overflowY: 'auto', border: '1px solid #f0f0f0', borderRadius: 1 }}>
+              <Box sx={{ mb: 2, maxHeight: 180, overflowY: 'auto', border: '1px solid #f0f0f0', borderRadius: 1, ...SCROLL_BOX_SX }}>
                 {students.filter(s => s.status !== 'archive').map(s => (
                   <Box key={s.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1, borderBottom: '1px solid #fafafa' }}>
                     <StudentPhotoCell student={s} onUpdated={url => updateStudentPhoto(s.id, url)} />
@@ -277,7 +291,7 @@ export default function CardsPage() {
             )}
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Button variant="contained" fullWidth disabled={!cardStudent || cardLoading}
+              <Button variant="contained" fullWidth disabled={!cardStudent || cardLoading} sx={DISABLED_BTN_SX}
                 startIcon={cardLoading ? <CircularProgress size={14} color="inherit" /> : <FontAwesomeIcon icon={faPrint} style={{ fontSize: '0.85rem' }} />}
                 onClick={() => handlePrintCard(true)}>
                 Carte individuelle
@@ -349,7 +363,7 @@ export default function CardsPage() {
               </Select>
             </FormControl>
 
-            <Box sx={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #f0f0f0', borderRadius: 1, mb: 2 }}>
+            <Box sx={{ maxHeight: 180, overflowY: 'auto', border: '1px solid #f0f0f0', borderRadius: 1, mb: 2, ...SCROLL_BOX_SX }}>
               {staff.map(s => (
                 <Box key={s.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1, borderBottom: '1px solid #fafafa' }}>
                   <Avatar src={(s as any).avatar_url || ''} sx={{ width: 34, height: 34, bgcolor: '#d97706', fontSize: '0.7rem' }}>
@@ -368,7 +382,7 @@ export default function CardsPage() {
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <Button variant="contained" fullWidth
-                sx={{ bgcolor: '#d97706', '&:hover': { bgcolor: '#b45309' } }}
+                sx={{ '&:not(.Mui-disabled)': { backgroundImage: 'none !important', bgcolor: '#d97706 !important' }, '&:hover': { bgcolor: '#b45309 !important' }, ...DISABLED_BTN_SX }}
                 disabled={!badgeStaff || badgeLoading}
                 startIcon={badgeLoading ? <CircularProgress size={14} color="inherit" /> : <FontAwesomeIcon icon={faPrint} style={{ fontSize: '0.85rem' }} />}
                 onClick={() => handlePrintBadge(false)}>
@@ -422,7 +436,7 @@ export default function CardsPage() {
             </Box>
 
             <Button variant="contained" fullWidth disabled={!collStudent || collLoading}
-              sx={{ bgcolor: '#7c3aed', '&:hover': { bgcolor: '#6d28d9' } }}
+              sx={{ '&:not(.Mui-disabled)': { backgroundImage: 'none !important', bgcolor: '#7c3aed !important' }, '&:hover': { bgcolor: '#6d28d9 !important' }, ...DISABLED_BTN_SX }}
               startIcon={collLoading ? <CircularProgress size={14} color="inherit" /> : <FontAwesomeIcon icon={faPrint} style={{ fontSize: '0.85rem' }} />}
               onClick={handlePrintCollante}>
               Générer le relevé

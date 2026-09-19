@@ -36,6 +36,7 @@ import Library from './pages/Library/Library'
 import Health from './pages/Health/Health'
 import Services from './pages/Services/Services'
 import SuperAdmin from './pages/SuperAdmin/SuperAdmin'
+import PlatformUsers from './pages/PlatformUsers/PlatformUsers'
 // Portail Élève
 import StudentDashboard from './pages/Portal/Student/StudentDashboard'
 import StudentGrades from './pages/Portal/Student/StudentGrades'
@@ -149,7 +150,8 @@ function AppRoutes() {
         <Route path="library"         element={<Library />} />
         <Route path="health"          element={<Health />} />
         <Route path="services"        element={<Services />} />
-        <Route path="admin"           element={<SuperAdmin />} />
+        <Route path="admin"           element={user.role === 'super_admin' ? <SuperAdmin /> : <Navigate to="/" replace />} />
+        <Route path="admin/users"     element={user.role === 'super_admin' ? <PlatformUsers /> : <Navigate to="/" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

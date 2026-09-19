@@ -17,6 +17,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import SkeletonTable from '../../components/ui/SkeletonTable'
 import EmptyState from '../../components/ui/EmptyState'
 import DataTablePagination from '../../components/ui/DataTablePagination'
+import CredentialsDialog, { Credential } from '../../components/ui/CredentialsDialog'
 
 const statusColors: Record<string, string> = {
   inscrit: '#dcfce7', pre_inscrit: '#fef9c3', reinscrit: '#dbeafe', archive: '#f3f4f6',
@@ -55,8 +56,9 @@ function SectionLabel({ label }: { label: string }) {
   )
 }
 
-function StudentForm({ open, onClose, student, classes, onSaved }: {
+function StudentForm({ open, onClose, student, classes, onSaved, onCredentials }: {
   open: boolean; onClose: () => void; student: Student | null; classes: Class[]; onSaved: () => void
+  onCredentials: (creds: Credential[]) => void
 }) {
   const { showToast } = useToast()
 
@@ -141,8 +143,15 @@ function StudentForm({ open, onClose, student, classes, onSaved }: {
         payload.parent_id = null
       }
 
-      if (student) await api.put(`/students/${student.id}`, payload)
-      else         await api.post('/students', payload)
+      if (student) {
+        await api.put(`/students/${student.id}`, payload)
+      } else {
+        const r = await api.post('/students', payload)
+        const creds: Credential[] = []
+        if (r.data.credentials?.student) creds.push({ label: 'Compte élève', ...r.data.credentials.student })
+        if (r.data.credentials?.parent) creds.push({ label: 'Compte parent', ...r.data.credentials.parent })
+        if (creds.length) onCredentials(creds)
+      }
 
       showToast(student ? 'Élève modifié avec succès' : 'Élève ajouté avec succès', 'success')
       onSaved(); onClose()
@@ -332,8 +341,8 @@ function StudentForm({ open, onClose, student, classes, onSaved }: {
               <Grid item xs={12}>
                 <Box sx={{ p: 1.5, bgcolor: '#fffbeb', borderRadius: 1, border: '1px solid #fde68a' }}>
                   <Typography variant="caption" color="text.secondary">
-                    Un compte parent sera créé avec le mot de passe provisoire <strong>Ecolio1234!</strong>.
-                    Le parent devra le changer lors de sa première connexion.
+                    Un compte parent sera créé avec un mot de passe temporaire généré automatiquement
+                    (affiché une seule fois après l'enregistrement). Le parent devra le changer lors de sa première connexion.
                   </Typography>
                 </Box>
               </Grid>
@@ -363,6 +372,7 @@ export default function Students() {
   const [formOpen, setFormOpen] = useState(false)
   const [selected, setSelected] = useState<Student | null>(null)
   const [toArchive, setToArchive] = useState<Student | null>(null)
+  const [newCredentials, setNewCredentials] = useState<Credential[]>([])
   const [archiving, setArchiving] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('last_name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
@@ -581,7 +591,11 @@ export default function Students() {
         )}
       </Card>
 
-      <StudentForm open={formOpen} onClose={() => setFormOpen(false)} student={selected} classes={classes} onSaved={load} />
+      <StudentForm open={formOpen} onClose={() => setFormOpen(false)} student={selected} classes={classes} onSaved={load}
+        onCredentials={setNewCredentials} />
+
+      <CredentialsDialog open={newCredentials.length > 0} credentials={newCredentials}
+        onClose={() => setNewCredentials([])} />
 
       <ConfirmDialog
         open={!!toArchive}

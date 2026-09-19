@@ -10,7 +10,7 @@ import {
   faIdBadge, faWallet, faEnvelope, faGear, faChevronLeft, faBars,
   faGraduationCap, faAddressCard, faChalkboard, faXmark, faBookOpen, faUserGroup,
   faFileSignature, faFingerprint, faMoneyBillWave, faCommentSms, faHouse,
-  faBook, faBriefcaseMedical, faBus, faGlobe, faMagnifyingGlass, faClockRotateLeft, faTrophy
+  faBook, faBriefcaseMedical, faBus, faGlobe, faMagnifyingGlass, faClockRotateLeft, faTrophy, faUsersGear
 } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
@@ -24,6 +24,7 @@ const navItems: NavItem[] = [
   { path: '/accueil',        label: 'Accueil',          icon: faHouse,         section: 'Général',            roles: ['super_admin','director','teacher','parent','student','accountant','counselor','librarian','nurse','maintenance','secretary'] },
   { path: '/',                label: 'Tableau de bord',  icon: faGauge,         section: 'Général',            roles: ['super_admin','director','teacher','parent','accountant','secretary'] },
   { path: '/admin',          label: 'Plateforme',       icon: faGlobe,         section: 'Général',            roles: ['super_admin'] },
+  { path: '/admin/users',    label: 'Utilisateurs',     icon: faUsersGear,     section: 'Général',            roles: ['super_admin'] },
 
   { path: '/classes',         label: 'Classes',          icon: faChalkboard,    section: 'Pédagogie',          roles: ['super_admin','director','teacher','counselor','secretary'] },
   { path: '/students',        label: 'Élèves',           icon: faUsers,         section: 'Pédagogie',          roles: ['super_admin','director','teacher','nurse','secretary'] },
@@ -78,8 +79,17 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     return Array.from(map.entries())
   }, [visible, search])
 
+  // Le chemin actif le plus spécifique (le plus long) gagne, pour qu'une route imbriquée
+  // (ex. /admin/users) ne mette pas AUSSI en surbrillance son parent (/admin).
+  const activePath = useMemo(() => {
+    const matches = visible.filter(n =>
+      n.path === '/' ? location.pathname === '/' : (location.pathname === n.path || location.pathname.startsWith(`${n.path}/`))
+    )
+    return matches.sort((a, b) => b.path.length - a.path.length)[0]?.path
+  }, [visible, location.pathname])
+
   const renderItem = (item: NavItem, isCollapsed: boolean) => {
-    const active = item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path)
+    const active = item.path === activePath
     return (
       <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
         <Tooltip title={isCollapsed ? item.label : ''} placement="right">

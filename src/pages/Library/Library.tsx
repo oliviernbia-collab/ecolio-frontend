@@ -6,7 +6,7 @@ import {
   InputLabel, CircularProgress, Tooltip, Tabs, Tab
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faMagnifyingGlass, faPlus, faPenToSquare, faTrash, faBook, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faPlus, faPenToSquare, faTrash, faBook, faRotateLeft, faPhone } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { Book, BookLoan, Student, StaffMember } from '../../types'
 import { ECOLIO_NAVY } from '../../theme'
@@ -79,6 +79,12 @@ function LoanForm({ open, onClose, books, students, staff, onSaved }: {
   useEffect(() => { if (open) { setForm(empty); setError('') } }, [open])
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }))
 
+  const selectedStudent = form.borrower_type === 'student' ? students.find(s => String(s.id) === String(form.student_id)) : null
+  const selectedStaff = form.borrower_type === 'staff' ? staff.find(s => String(s.id) === String(form.staff_id)) : null
+  const borrowerPhone = selectedStudent
+    ? (selectedStudent.parent_phone || selectedStudent.emergency_contact_phone)
+    : selectedStaff?.phone
+
   const handleSave = async () => {
     if (!form.book_id || !form.due_date || (form.borrower_type === 'student' ? !form.student_id : !form.staff_id)) {
       setError('Tous les champs sont requis'); return
@@ -139,6 +145,21 @@ function LoanForm({ open, onClose, books, students, staff, onSaved }: {
                 </Select>
               </FormControl>
             )}
+          </Grid>
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.2, bgcolor: '#f8f9fc', borderRadius: 1, border: '1px solid #eef0f4' }}>
+              <FontAwesomeIcon icon={faPhone} style={{ fontSize: '0.8rem', color: (selectedStudent || selectedStaff) ? ECOLIO_NAVY : '#9ca3af' }} />
+              {selectedStudent || selectedStaff ? (
+                <Typography variant="body2">
+                  {selectedStudent ? 'Téléphone du parent : ' : 'Téléphone : '}
+                  <strong>{borrowerPhone || 'non renseigné'}</strong>
+                </Typography>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Sélectionnez {form.borrower_type === 'student' ? 'un élève' : 'un membre du personnel'} pour voir son numéro de téléphone
+                </Typography>
+              )}
+            </Box>
           </Grid>
           <Grid item xs={12}>
             <TextField fullWidth label="Date de retour prévue" type="date" value={form.due_date}

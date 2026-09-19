@@ -11,6 +11,7 @@ import api from '../../lib/axios'
 import { StaffMember } from '../../types'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
+import CredentialsDialog, { Credential } from '../../components/ui/CredentialsDialog'
 
 const roleLabels: Record<string, string> = {
   director:    'Directeur',
@@ -32,6 +33,7 @@ export default function Staff() {
   const [selected, setSelected] = useState<StaffMember | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<StaffMember | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [newCredentials, setNewCredentials] = useState<Credential | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -135,7 +137,10 @@ export default function Staff() {
       </Card>
 
       <StaffForm open={formOpen} onClose={() => setFormOpen(false)} member={selected}
-        onSaved={() => { load(); }} />
+        onSaved={() => { load(); }} onCredentials={setNewCredentials} />
+
+      <CredentialsDialog open={!!newCredentials} credentials={newCredentials ? [newCredentials] : []}
+        onClose={() => setNewCredentials(null)} />
 
       {/* Dialog confirmation suppression */}
       <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth
@@ -167,7 +172,10 @@ export default function Staff() {
   )
 }
 
-function StaffForm({ open, onClose, member, onSaved }: { open: boolean; onClose: () => void; member: StaffMember | null; onSaved: () => void }) {
+function StaffForm({ open, onClose, member, onSaved, onCredentials }: {
+  open: boolean; onClose: () => void; member: StaffMember | null; onSaved: () => void
+  onCredentials: (cred: Credential) => void
+}) {
   const { showToast } = useToast()
   const empty = { first_name: '', last_name: '', email: '', phone: '', role: 'teacher', position: '', contract_type: 'CDI', hire_date: '', salary: '', password: '' }
   const [form, setForm] = useState<any>(empty)
@@ -181,8 +189,12 @@ function StaffForm({ open, onClose, member, onSaved }: { open: boolean; onClose:
   const handleSave = async () => {
     setSaving(true)
     try {
-      if (member) await api.put(`/staff/${member.id}`, form)
-      else await api.post('/staff', form)
+      if (member) {
+        await api.put(`/staff/${member.id}`, form)
+      } else {
+        const r = await api.post('/staff', form)
+        if (r.data.credentials) onCredentials({ label: 'Nouveau membre du personnel', ...r.data.credentials })
+      }
       showToast(member ? 'Membre modifié avec succès' : 'Membre ajouté avec succès', 'success')
       onSaved()
       onClose()
@@ -220,7 +232,7 @@ function StaffForm({ open, onClose, member, onSaved }: { open: boolean; onClose:
           </Grid>
           <Grid item xs={12} sm={6}><TextField fullWidth label="Date d'embauche" type="date" value={form.hire_date || ''} onChange={e => set('hire_date', e.target.value)} InputLabelProps={{ shrink: true }} /></Grid>
           <Grid item xs={12} sm={6}><TextField fullWidth label="Salaire (FCFA)" type="number" value={form.salary || ''} onChange={e => set('salary', e.target.value)} /></Grid>
-          {!member && <Grid item xs={12}><TextField fullWidth label="Mot de passe" type="password" value={form.password} onChange={e => set('password', e.target.value)} helperText="Laissez vide pour le mot de passe par défaut (Ecolio1234!)" /></Grid>}
+          {!member && <Grid item xs={12}><TextField fullWidth label="Mot de passe" type="password" value={form.password} onChange={e => set('password', e.target.value)} helperText="Laissez vide pour générer un mot de passe temporaire aléatoire" /></Grid>}
         </Grid>
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>

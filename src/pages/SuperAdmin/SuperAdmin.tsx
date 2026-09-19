@@ -178,7 +178,16 @@ export default function SuperAdmin() {
         )}
       </Card>
 
+      <Typography variant="h6" fontWeight={700} mb={0.5}>Écoles clientes</Typography>
+      <Typography variant="body2" color="text.secondary" mb={2}>
+        Liste de toutes les écoles inscrites sur la plateforme.
+      </Typography>
       <Card>
+        {schools.length === 0 ? (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <Typography variant="body2" color="text.secondary">Aucune école enregistrée.</Typography>
+          </Box>
+        ) : (
         <TableContainer sx={{ overflowX: 'auto' }}>
           <Table sx={{ minWidth: 640 }}>
             <TableHead>
@@ -218,6 +227,7 @@ export default function SuperAdmin() {
             </TableBody>
           </Table>
         </TableContainer>
+        )}
       </Card>
 
       <Typography variant="h6" fontWeight={700} sx={{ mt: 4, mb: 0.5 }}>Journal d'activité</Typography>

@@ -53,7 +53,8 @@ export default function ForcePasswordChange() {
               helperText={pwd.confirm && pwd.confirm !== pwd.new_password ? 'Les mots de passe ne correspondent pas' : ''} />
           </Box>
           <Box mt={3} display="flex" flexDirection="column" gap={1}>
-            <Button fullWidth variant="contained" sx={{ bgcolor: ECOLIO_BLUE }}
+            <Button fullWidth variant="contained"
+              sx={{ '&:not(.Mui-disabled)': { backgroundImage: 'none !important', bgcolor: `${ECOLIO_BLUE} !important` } }}
               startIcon={<FontAwesomeIcon icon={faLock} style={{ fontSize: '0.85rem' }} />}
               onClick={submit} disabled={saving}>
               Valider le nouveau mot de passe

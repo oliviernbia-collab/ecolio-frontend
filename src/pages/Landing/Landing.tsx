@@ -18,6 +18,7 @@ import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useAuth } from '../../contexts/AuthContext'
 import SiteHeader from '../../components/Site/SiteHeader'
 import SiteFooter from '../../components/Site/SiteFooter'
+import BackToTop from '../../components/Site/BackToTop'
 
 const FEATURE_COLORS = ['#1A3C5E', '#2E86AB', '#16a34a', '#d97706', '#7c3aed', '#0ea5e9']
 
@@ -463,6 +464,7 @@ export default function Landing() {
       )}
 
       <SiteFooter />
+      <BackToTop />
     </Box>
   )
 }

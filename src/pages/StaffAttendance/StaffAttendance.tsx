@@ -85,12 +85,12 @@ function SelfServiceView() {
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center' }}>
               <Button variant="contained" size="large" disabled={busy || !!record?.check_in_time}
                 startIcon={<FontAwesomeIcon icon={faRightToBracket} />} onClick={handleCheckIn}
-                sx={{ bgcolor: '#16a34a', '&:hover': { bgcolor: '#15803d' } }}>
+                sx={{ '&:not(.Mui-disabled)': { backgroundImage: 'none !important', bgcolor: '#16a34a !important' }, '&:hover': { bgcolor: '#15803d !important' } }}>
                 Pointer arrivée
               </Button>
               <Button variant="contained" size="large" disabled={busy || !record?.check_in_time || !!record?.check_out_time}
                 startIcon={<FontAwesomeIcon icon={faRightFromBracket} />} onClick={handleCheckOut}
-                sx={{ bgcolor: '#dc2626', '&:hover': { bgcolor: '#b91c1c' } }}>
+                sx={{ '&:not(.Mui-disabled)': { backgroundImage: 'none !important', bgcolor: '#dc2626 !important' }, '&:hover': { bgcolor: '#b91c1c !important' } }}>
                 Pointer départ
               </Button>
             </Box>

@@ -154,8 +154,8 @@ function DirectorDashboard({ data }: { data: any }) {
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={<Typography variant="caption" fontWeight={500}>{a.student_name}</Typography>}
-                        secondary={<Typography variant="caption" color="text.secondary">{a.class_name} · {a.date}</Typography>} />
+                        primary={<Typography variant="caption" fontWeight={500} display="block">{a.student_name}</Typography>}
+                        secondary={<Typography variant="caption" color="text.secondary" display="block">{a.class_name} · {new Date(a.date).toLocaleDateString('fr-FR')}</Typography>} />
                       <Chip label={a.justified ? 'Justifié' : 'Non justifié'} size="small"
                         sx={{ fontSize: '0.6rem', height: 18, bgcolor: a.justified ? '#dcfce7' : '#fee2e2', color: a.justified ? '#16a34a' : '#dc2626' }} />
                     </ListItem>
@@ -405,8 +405,8 @@ function ParentDashboard({ data }: { data: any }) {
                     {data.recentAbsences.slice(0, 4).map((a: any, i: number) => (
                       <ListItem key={i} disablePadding sx={{ py: 0.5 }}>
                         <ListItemText
-                          primary={<Typography variant="caption" fontWeight={500}>{a.student_name}</Typography>}
-                          secondary={<Typography variant="caption" color="text.secondary">{a.class_name} · {a.date}</Typography>} />
+                          primary={<Typography variant="caption" fontWeight={500} display="block">{a.student_name}</Typography>}
+                          secondary={<Typography variant="caption" color="text.secondary" display="block">{a.class_name} · {new Date(a.date).toLocaleDateString('fr-FR')}</Typography>} />
                         <Chip label={a.justified ? 'Justifié' : 'Non just.'} size="small"
                           sx={{ fontSize: '0.6rem', height: 18, bgcolor: a.justified ? '#dcfce7' : '#fee2e2', color: a.justified ? '#16a34a' : '#dc2626' }} />
                       </ListItem>

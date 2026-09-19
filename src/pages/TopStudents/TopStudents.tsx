@@ -10,7 +10,7 @@ import { faPlus, faPenToSquare, faTrash, faTrophy, faEye } from '@fortawesome/fr
 import { Link } from 'react-router-dom'
 import api from '../../lib/axios'
 import { AcademicYear, Class, Student, TopStudent } from '../../types'
-import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
+import { ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import SkeletonTable from '../../components/ui/SkeletonTable'
@@ -23,11 +23,6 @@ const PERIODS = [
 ]
 
 const CYCLE_LABELS: Record<string, string> = { maternelle: 'Maternelle', primaire: 'Primaire', secondaire: 'Secondaire' }
-
-// Texte blanc lisible (au lieu du gris quasi invisible par défaut de MUI) quand le bouton est désactivé
-const DISABLED_BTN_SX = {
-  '&.Mui-disabled': { bgcolor: `${ECOLIO_NAVY}59`, color: 'rgba(255,255,255,0.75)' },
-}
 
 function TopStudentForm({ open, onClose, entry, classes, academicYearId, period, onSaved }: {
   open: boolean; onClose: () => void; entry: TopStudent | null; classes: Class[]
@@ -183,7 +178,7 @@ export default function TopStudents() {
           </Button>
           <Tooltip title={years.length === 0 ? "Créez d'abord une année scolaire (menu Administration)" : ''}>
             <span>
-              <Button variant="contained" sx={DISABLED_BTN_SX}
+              <Button variant="contained"
                 startIcon={<FontAwesomeIcon icon={faPlus} style={{ fontSize: '0.85rem' }} />}
                 onClick={() => { setEditing(null); setFormOpen(true) }} disabled={!academicYearId}>
                 Désigner un major

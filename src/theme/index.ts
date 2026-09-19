@@ -29,6 +29,10 @@ export const theme = createTheme({
         containedPrimary: {
           background: `linear-gradient(135deg, ${ECOLIO_NAVY} 0%, ${ECOLIO_BLUE} 100%)`,
           '&:hover': { background: `linear-gradient(135deg, #0f2236 0%, #1e6b8a 100%)` },
+          // Le gris quasi invisible par défaut de MUI (texte 26% + fond 12% de noir) est
+          // remplacé par du blanc à 75% sur un fond navy atténué, nettement plus lisible
+          // tout en restant clairement "désactivé".
+          '&.Mui-disabled': { background: `${ECOLIO_NAVY}59`, color: 'rgba(255,255,255,0.75)' },
         },
       },
     },

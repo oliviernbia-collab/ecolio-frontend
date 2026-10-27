@@ -6,7 +6,7 @@ import { ECOLIO_NAVY } from '../../theme'
 import { useAuth } from '../../contexts/AuthContext'
 
 const CONTACT_EMAIL = 'oliviernbia@gmail.com'
-const CONTACT_PHONE = '0554183378'
+const CONTACT_PHONE = '+225 0554183378'
 
 export default function SiteFooter() {
   const { user } = useAuth()
@@ -65,7 +65,7 @@ export default function SiteFooter() {
                 <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.8rem', flexShrink: 0 }} />
                 <Box component="span" sx={{ wordBreak: 'break-all' }}>{CONTACT_EMAIL}</Box>
               </Typography>
-              <Typography component="a" href={`tel:+225${CONTACT_PHONE}`} variant="body2"
+              <Typography component="a" href={`tel:${CONTACT_PHONE.replace(/\s/g, '')}`} variant="body2"
                 sx={{ color: 'inherit', textDecoration: 'none', opacity: 0.8, '&:hover': { opacity: 1 }, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <FontAwesomeIcon icon={faPhone} style={{ fontSize: '0.8rem', flexShrink: 0 }} />
                 {CONTACT_PHONE}

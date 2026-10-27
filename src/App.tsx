@@ -38,6 +38,7 @@ import Library from './pages/Library/Library'
 import Health from './pages/Health/Health'
 import Services from './pages/Services/Services'
 import SuperAdmin from './pages/SuperAdmin/SuperAdmin'
+import Contact from './pages/Contact/Contact'
 import PlatformUsers from './pages/PlatformUsers/PlatformUsers'
 // Portail Élève
 import StudentDashboard from './pages/Portal/Student/StudentDashboard'
@@ -75,6 +76,7 @@ function AppRoutes() {
         <Route path="/login"           element={<Login />} />
         <Route path="/register"        element={<Register />} />
         <Route path="/tableau-honneur" element={<HonorRoll />} />
+        <Route path="/contact"         element={<Contact />} />
         <Route path="/ecoles/:id"      element={<SchoolProfile />} />
         <Route path="*"                element={<Navigate to="/" replace />} />
       </Routes>
@@ -129,6 +131,7 @@ function AppRoutes() {
       <Route path="/register"        element={<Navigate to="/" replace />} />
       <Route path="/accueil"         element={<Landing />} />
       <Route path="/tableau-honneur" element={<HonorRoll />} />
+      <Route path="/contact"         element={<Contact />} />
       <Route path="/ecoles/:id"      element={<SchoolProfile />} />
       <Route path="/" element={<Layout />}>
         <Route index                  element={<Dashboard />} />
@@ -167,7 +170,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter>
         <AuthProvider>
           <ToastProvider>
             <AppRoutes />

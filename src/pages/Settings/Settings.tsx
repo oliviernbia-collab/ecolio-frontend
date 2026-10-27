@@ -4,18 +4,30 @@ import {
   CircularProgress, Avatar, Tabs, Tab, IconButton, Tooltip, Badge, Switch, FormControlLabel
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faFloppyDisk, faSchool, faUser, faLock, faCamera, faImage, faCreditCard } from '@fortawesome/free-solid-svg-icons'
+import { faFloppyDisk, faSchool, faUser, faLock, faCamera, faImage, faCreditCard, faSliders, faGift, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { useAuth } from '../../contexts/AuthContext'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
 import SubscriptionPanel from '../../components/Subscription/SubscriptionPanel'
 import PasswordField from '../../components/ui/PasswordField'
+import { PlatformSettingsPanel, GiftsPanel, ContactMessagesPanel } from './PlatformAdminPanels'
+import TwoFactorCard from '../../components/Security/TwoFactorCard'
+import { useSearchParams } from 'react-router-dom'
+
+type SettingsTab = 'school' | 'profile' | 'password' | 'subscription' | 'platform' | 'gifts' | 'contact'
 
 export default function Settings() {
   const { user, updateUser } = useAuth()
   const { showToast } = useToast()
-  const [tab, setTab]       = useState(0)
+  const isSuperAdmin = user?.role === 'super_admin'
+  // Le super admin n'est rattaché à aucune école : pas d'onglet École, mais les onglets de la plateforme.
+  // ?tab=password permet d'ouvrir directement un onglet (ex. lien « Activer la double authentification »).
+  const [searchParams] = useSearchParams()
+  const [tab, setTab]       = useState<SettingsTab>(
+    (searchParams.get('tab') as SettingsTab) || (isSuperAdmin ? 'platform' : 'school')
+  )
+  const [unreadContact, setUnreadContact] = useState(0)
   const [school, setSchool] = useState<any>(null)
   const [profile, setProfile] = useState({
     first_name: user?.first_name || '',
@@ -30,8 +42,12 @@ export default function Settings() {
   const logoInputRef   = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    api.get('/schools').then(r => setSchool(r.data.school || {})).catch(() => {})
-  }, [])
+    if (isSuperAdmin) {
+      api.get('/admin/contact-messages?status=new').then(r => setUnreadContact(r.data.unread)).catch(() => {})
+    } else {
+      api.get('/schools').then(r => setSchool(r.data.school || {})).catch(() => {})
+    }
+  }, [isSuperAdmin])
 
   // ── Photo de profil ──────────────────────────────────────────────────────────
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,16 +122,33 @@ export default function Settings() {
       <Tabs value={tab} onChange={(_, v) => setTab(v)}
         variant="scrollable" scrollButtons="auto" allowScrollButtonsMobile
         sx={{ mb: 3, '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 } }}>
-        <Tab icon={<FontAwesomeIcon icon={faSchool} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="École" />
-        <Tab icon={<FontAwesomeIcon icon={faUser}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mon profil" />
-        <Tab icon={<FontAwesomeIcon icon={faLock}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mot de passe" />
+        {isSuperAdmin && (
+          <Tab value="platform" icon={<FontAwesomeIcon icon={faSliders} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Plateforme" />
+        )}
+        {isSuperAdmin && (
+          <Tab value="gifts" icon={<FontAwesomeIcon icon={faGift} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Cadeaux" />
+        )}
+        {isSuperAdmin && (
+          <Tab value="contact" icon={<FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.9rem' }} />} iconPosition="start"
+            label={<Badge color="error" badgeContent={unreadContact} sx={{ '& .MuiBadge-badge': { right: -10 } }}>Messages</Badge>} />
+        )}
+        {!isSuperAdmin && (
+          <Tab value="school" icon={<FontAwesomeIcon icon={faSchool} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="École" />
+        )}
+        <Tab value="profile" icon={<FontAwesomeIcon icon={faUser}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mon profil" />
+        <Tab value="password" icon={<FontAwesomeIcon icon={faLock}   style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Mot de passe" />
         {user?.school_id && (
-          <Tab icon={<FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Abonnement" />
+          <Tab value="subscription" icon={<FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '0.9rem' }} />} iconPosition="start" label="Abonnement" />
         )}
       </Tabs>
 
+      {/* ── Onglets super admin ──────────────────────────────────────────────── */}
+      {tab === 'platform' && isSuperAdmin && <PlatformSettingsPanel />}
+      {tab === 'gifts' && isSuperAdmin && <GiftsPanel />}
+      {tab === 'contact' && isSuperAdmin && <ContactMessagesPanel onUnreadChange={setUnreadContact} />}
+
       {/* ── Onglet École ─────────────────────────────────────────────────────── */}
-      {tab === 0 && school && (
+      {tab === 'school' && school && (
         <Card>
           <CardContent sx={{ p: 3 }}>
             <Typography variant="subtitle1" fontWeight={600} mb={2.5}>Informations de l'école</Typography>
@@ -231,7 +264,7 @@ export default function Settings() {
       )}
 
       {/* ── Onglet Mon profil ─────────────────────────────────────────────────── */}
-      {tab === 1 && (
+      {tab === 'profile' && (
         <Card>
           <CardContent sx={{ p: 3 }}>
             {/* Avatar upload */}
@@ -307,7 +340,8 @@ export default function Settings() {
       )}
 
       {/* ── Onglet Mot de passe ───────────────────────────────────────────────── */}
-      {tab === 2 && (
+      {tab === 'password' && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Card sx={{ maxWidth: 480 }}>
           <CardContent sx={{ p: 3 }}>
             <Typography variant="subtitle1" fontWeight={600} mb={2.5}>Changer le mot de passe</Typography>
@@ -334,10 +368,12 @@ export default function Settings() {
             </Box>
           </CardContent>
         </Card>
+        <TwoFactorCard />
+        </Box>
       )}
 
       {/* ── Onglet Abonnement ────────────────────────────────────────────────── */}
-      {tab === 3 && user?.school_id && (
+      {tab === 'subscription' && user?.school_id && (
         <Card>
           <CardContent sx={{ p: 3 }}>
             <Typography variant="subtitle1" fontWeight={600} mb={2.5}>Abonnement</Typography>

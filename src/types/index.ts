@@ -13,6 +13,7 @@ export interface User {
   secondary_color?: string
   school_logo?: string
   must_change_password?: boolean | number
+  totp_enabled?: boolean | number
   subscription?: SubscriptionState | null
 }
 
@@ -36,6 +37,7 @@ export interface SubscriptionPayment {
   submitted_at: string
   submitted_by_name?: string
   reviewed_at?: string | null
+  reviewed_by_name?: string | null
   review_note?: string | null
 }
 

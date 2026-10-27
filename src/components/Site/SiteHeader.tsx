@@ -3,10 +3,11 @@ import {
   Box, Container, Typography, Button, IconButton, Drawer, Divider, List, ListItemButton
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faGauge, faBars, faXmark, faTrophy, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faGauge, faBars, faXmark, faTrophy, faRightFromBracket, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useAuth } from '../../contexts/AuthContext'
+import AnnouncementBar from './AnnouncementBar'
 
 const ANCHOR_LINKS = [
   { id: 'fonctionnalites', label: 'Fonctionnalités' },
@@ -89,6 +90,7 @@ export default function SiteHeader() {
 
   return (
     <Box sx={{ borderBottom: '1px solid #eef0f4', bgcolor: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 10 }}>
+      <AnnouncementBar />
       <Container maxWidth="lg">
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 1.5, gap: 1 }}>
           <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 }, flexShrink: 0, textDecoration: 'none' }}>
@@ -114,6 +116,12 @@ export default function SiteHeader() {
               color: location.pathname === '/tableau-honneur' ? ECOLIO_BLUE : NAV_LINK_SX.color,
             }}>
               Tableau d'honneur
+            </Typography>
+            <Typography component={Link} to="/contact" sx={{
+              ...NAV_LINK_SX,
+              color: location.pathname === '/contact' ? ECOLIO_BLUE : NAV_LINK_SX.color,
+            }}>
+              Contact
             </Typography>
           </Box>
 
@@ -154,6 +162,11 @@ export default function SiteHeader() {
             sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <FontAwesomeIcon icon={faTrophy} style={{ fontSize: '0.85rem', color: '#d97706' }} />
             <Typography sx={{ fontWeight: 500 }}>Tableau d'honneur</Typography>
+          </ListItemButton>
+          <ListItemButton component={Link} to="/contact" onClick={() => setMobileOpen(false)}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.85rem', color: ECOLIO_BLUE }} />
+            <Typography sx={{ fontWeight: 500 }}>Contact</Typography>
           </ListItemButton>
         </List>
         <Divider />

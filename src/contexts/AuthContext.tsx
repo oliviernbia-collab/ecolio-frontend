@@ -4,38 +4,38 @@ import { User } from '../types'
 
 interface AuthContextType {
   user: User | null
-  token: string | null
   loading: boolean
-  login: (email: string, password: string) => Promise<void>
+  // Renvoie un jeton d'étape quand la double authentification est activée (code à demander ensuite)
+  login: (email: string, password: string) => Promise<{ challengeToken?: string }>
+  verifyTwoFactor: (challengeToken: string, code: string) => Promise<void>
   logout: () => void
   updateUser: (data: Partial<User>) => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+// La session elle-même vit dans un cookie httpOnly géré par le backend. Seul le profil
+// (non sensible) est mis en cache dans localStorage pour afficher l'interface sans attendre.
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('ecolio_token')
+    // Ancien stockage du jeton (avant le passage au cookie httpOnly) : on le supprime
+    localStorage.removeItem('ecolio_token')
     const savedUser = localStorage.getItem('ecolio_user')
-    if (savedToken && savedUser) {
-      setToken(savedToken)
+    if (savedUser) {
       setUser(JSON.parse(savedUser))
       // Refresh user data
       api.get('/auth/me').then((res) => {
         setUser(res.data.user)
         localStorage.setItem('ecolio_user', JSON.stringify(res.data.user))
       }).catch((err) => {
-        // Ne déconnecter que si le token est explicitement rejeté (401),
+        // Ne déconnecter que si la session est explicitement rejetée (401),
         // pas sur erreur réseau (backend pas encore démarré, timeout…)
         const status = err?.response?.status
         if (status === 401 || status === 403) {
-          localStorage.removeItem('ecolio_token')
           localStorage.removeItem('ecolio_user')
-          setToken(null)
           setUser(null)
         }
         // Erreur réseau → on garde la session en cache
@@ -45,19 +45,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const login = async (email: string, password: string) => {
-    const res = await api.post('/auth/login', { email, password })
-    const { token: t, user: u } = res.data
-    localStorage.setItem('ecolio_token', t)
+  const startSession = (u: User) => {
     localStorage.setItem('ecolio_user', JSON.stringify(u))
-    setToken(t)
     setUser(u)
   }
 
+  const login = async (email: string, password: string) => {
+    const res = await api.post('/auth/login', { email, password })
+    if (res.data.two_factor_required) return { challengeToken: res.data.challenge_token as string }
+    startSession(res.data.user)
+    return {}
+  }
+
+  const verifyTwoFactor = async (challengeToken: string, code: string) => {
+    const res = await api.post('/auth/login/2fa', { challenge_token: challengeToken, code })
+    startSession(res.data.user)
+  }
+
   const logout = () => {
-    localStorage.removeItem('ecolio_token')
+    // Révoque la session côté serveur (le cookie et le jeton deviennent inutilisables)
+    api.post('/auth/logout').catch(() => {})
     localStorage.removeItem('ecolio_user')
-    setToken(null)
     setUser(null)
   }
 
@@ -68,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, verifyTwoFactor, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

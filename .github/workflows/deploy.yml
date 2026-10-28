@@ -38,6 +38,9 @@ jobs:
       # tsc (vérification des types) puis vite build ; public/.htaccess est copié dans dist/
       - run: npm run build
 
+      # Repère de version : la vérification finale s'assure que c'est bien ce build qui est en ligne
+      - run: echo "${GITHUB_SHA}" > dist/version.txt
+
       - name: Secrets FTP configurés ?
         if: env.FTP_SERVER == ''
         run: |
@@ -56,6 +59,15 @@ jobs:
 
       - name: Vérification du site
         if: env.FTP_SERVER != ''
+        # Échoue si le site en ligne n'est pas ce build : sinon les fichiers ne sont pas arrivés
+        # à la racine du domaine (répertoire du compte FTP) et le déploiement serait faussement vert.
+        # Paramètre unique à chaque essai pour passer le cache Varnish de l'hébergeur.
         run: |
-          curl -fsSk -o /dev/null -w "Accueil : %{http_code}\n" https://ecolio.site/ \
-            || echo "::warning::Le site ne répond pas — vérifiez https://ecolio.site"
+          for i in $(seq 1 6); do
+            online=$(curl -fsSk "https://ecolio.site/version.txt?deploy=${GITHUB_SHA}&try=$i" | tr -d '[:space:]' || true)
+            if [ "$online" = "${GITHUB_SHA}" ]; then echo "Site OK : build ${GITHUB_SHA} en ligne"; exit 0; fi
+            sleep 10
+          done
+          echo "Version en ligne : ${online:-aucune (version.txt introuvable)}"
+          echo "::error::Le site en ligne n'est pas le build ${GITHUB_SHA}. Vérifiez que le répertoire du compte FTP est la racine du domaine ecolio.site."
+          exit 1

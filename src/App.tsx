@@ -100,6 +100,7 @@ function AppRoutes() {
           <Route path="grades"          element={<StudentGrades />} />
           <Route path="attendance"      element={<StudentAttendance />} />
           <Route path="schedule"        element={<StudentSchedule />} />
+          <Route path="messages"        element={<Messages />} />
         </Route>
         <Route path="*" element={<Navigate to="/portal/student" replace />} />
       </Routes>
@@ -117,6 +118,7 @@ function AppRoutes() {
             <Route path="attendance"   element={<ParentAttendance />} />
             <Route path="schedule"     element={<ParentSchedule />} />
             <Route path="finance"      element={<ParentFinance />} />
+            <Route path="messages"     element={<Messages />} />
           </Route>
           <Route path="*" element={<Navigate to="/portal/parent" replace />} />
         </Routes>

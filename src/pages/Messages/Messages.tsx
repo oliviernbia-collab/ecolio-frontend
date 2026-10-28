@@ -359,7 +359,9 @@ export default function Messages() {
   const detailRef = useRef<HTMLDivElement>(null)
 
   const canCompose = ['director', 'super_admin', 'secretary'].includes(user?.role || '')
-  const canReply   = ['teacher', 'director', 'super_admin', 'secretary'].includes(user?.role || '')
+  const canReply   = ['teacher', 'director', 'super_admin', 'secretary', 'parent'].includes(user?.role || '')
+  // Portails parent / élève : seulement les messages reçus de l'école (les réponses s'affichent dans le fil)
+  const isFamily   = ['parent', 'student'].includes(user?.role || '')
 
   const load = async () => {
     setLoading(true)
@@ -378,6 +380,8 @@ export default function Messages() {
       const r = await api.get(`/messages/${msg.id}`)
       setSelected(r.data.data)
       setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, read_at: new Date().toISOString() } : m))
+      // Le compteur de non-lus du portail parent / élève se met à jour sans changer de page
+      if (!msg.read_at) window.dispatchEvent(new Event('ecolio:message-read'))
     } catch { setSelected(msg) }
     setTimeout(() => detailRef.current?.scrollTo({ top: 0, behavior: 'smooth' }), 50)
   }
@@ -401,7 +405,9 @@ export default function Messages() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 3, gap: 2, flexWrap: 'wrap' }}>
         <Box>
           <Typography variant="h5" fontWeight={700}>Messagerie</Typography>
-          <Typography variant="body2" color="text.secondary">Communication école-famille</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {isFamily ? "Les messages envoyés par l'école" : 'Communication école-famille'}
+          </Typography>
         </Box>
         {canCompose && (
           <Button variant="contained"
@@ -423,7 +429,7 @@ export default function Messages() {
           flexDirection: 'column', flexShrink: 0,
         }}>
           {/* Onglets */}
-          <Box sx={{ display: 'flex', borderBottom: '1px solid #f0f0f0' }}>
+          <Box sx={{ display: isFamily ? 'none' : 'flex', borderBottom: '1px solid #f0f0f0' }}>
             {[
               { id: 'inbox' as const, label: 'Reçus',   icon: faInbox },
               { id: 'sent'  as const, label: 'Envoyés', icon: faShareFromSquare },

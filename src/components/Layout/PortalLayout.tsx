@@ -1,16 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import {
   AppBar, Toolbar, Typography, Box, Avatar, IconButton, Menu, MenuItem,
   Container, Tabs, Tab, Divider, useTheme, useMediaQuery, Drawer, List,
-  ListItemButton, ListItemIcon, ListItemText
+  ListItemButton, ListItemIcon, ListItemText, Badge
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
 import {
   faHouse, faBookOpen, faCalendarDays, faClockRotateLeft,
-  faFileInvoiceDollar, faRightFromBracket, faUser, faBars, faGraduationCap
+  faFileInvoiceDollar, faRightFromBracket, faUser, faBars, faGraduationCap, faEnvelope
 } from '@fortawesome/free-solid-svg-icons'
 import { useAuth } from '../../contexts/AuthContext'
+import api from '../../lib/axios'
+import NotificationBell from './NotificationBell'
 
 interface NavItem { label: string; icon: any; path: string }
 
@@ -19,6 +21,7 @@ const STUDENT_NAV: NavItem[] = [
   { label: 'Notes',           icon: faBookOpen,           path: '/portal/student/grades' },
   { label: 'Présences',       icon: faClockRotateLeft,    path: '/portal/student/attendance' },
   { label: 'Emploi du temps', icon: faCalendarDays,       path: '/portal/student/schedule' },
+  { label: 'Messages',        icon: faEnvelope,           path: '/portal/student/messages' },
 ]
 
 const PARENT_NAV: NavItem[] = [
@@ -27,6 +30,7 @@ const PARENT_NAV: NavItem[] = [
   { label: 'Présences',       icon: faClockRotateLeft,    path: '/portal/parent/attendance' },
   { label: 'Emploi du temps', icon: faCalendarDays,       path: '/portal/parent/schedule' },
   { label: 'Finances',        icon: faFileInvoiceDollar,  path: '/portal/parent/finance' },
+  { label: 'Messages',        icon: faEnvelope,           path: '/portal/parent/messages' },
 ]
 
 export default function PortalLayout() {
@@ -37,6 +41,27 @@ export default function PortalLayout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [unreadMessages, setUnreadMessages] = useState(0)
+
+  // Messages de l'école non lus, recomptés à chaque changement de page (ex. après lecture)
+  useEffect(() => {
+    api.get('/messages')
+      .then(r => setUnreadMessages((r.data.data || []).filter((m: { read_at: string | null }) => !m.read_at).length))
+      .catch(() => {})
+  }, [location.pathname])
+
+  useEffect(() => {
+    const onRead = () => setUnreadMessages(n => Math.max(0, n - 1))
+    window.addEventListener('ecolio:message-read', onRead)
+    return () => window.removeEventListener('ecolio:message-read', onRead)
+  }, [])
+
+  const navIcon = (n: NavItem, style: { fontSize: string; color?: string }) => {
+    const icon = <FontAwesomeIcon icon={n.icon} style={style} />
+    return n.path.endsWith('/messages') && unreadMessages > 0
+      ? <Badge badgeContent={unreadMessages} color="error">{icon}</Badge>
+      : icon
+  }
 
   const navItems = user?.role === 'student' ? STUDENT_NAV : PARENT_NAV
   const portalLabel = user?.role === 'student' ? 'Espace Élève' : 'Espace Parent'
@@ -84,7 +109,7 @@ export default function PortalLayout() {
                 <Tab
                   key={n.path}
                   label={n.label}
-                  icon={<FontAwesomeIcon icon={n.icon} style={{ fontSize: '0.85rem' }} />}
+                  icon={navIcon(n, { fontSize: '0.85rem' })}
                   iconPosition="start"
                   onClick={() => handleNav(n.path)}
                 />
@@ -93,6 +118,8 @@ export default function PortalLayout() {
           )}
 
           <Box sx={{ flexGrow: 1 }} />
+
+          <NotificationBell color="inherit" />
 
           {/* Avatar menu */}
           <IconButton onClick={e => setAnchorEl(e.currentTarget)} sx={{ p: 0.5 }}>
@@ -129,7 +156,7 @@ export default function PortalLayout() {
               onClick={() => handleNav(n.path)}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>
-                <FontAwesomeIcon icon={n.icon} style={{ fontSize: '0.9rem', color: '#1A3C5E' }} />
+                {navIcon(n, { fontSize: '0.9rem', color: '#1A3C5E' })}
               </ListItemIcon>
               <ListItemText primary={n.label} />
             </ListItemButton>

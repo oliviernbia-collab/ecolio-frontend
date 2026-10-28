@@ -15,6 +15,10 @@ export interface User {
   must_change_password?: boolean | number
   totp_enabled?: boolean | number
   subscription?: SubscriptionState | null
+  // Permissions effectives (rôle + écarts individuels décidés par le directeur)
+  permissions?: string[]
+  permissions_granted?: string[]
+  permissions_revoked?: string[]
 }
 
 export interface SubscriptionState {

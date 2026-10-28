@@ -6,13 +6,15 @@ import {
   FormControl, InputLabel, CircularProgress, Tooltip
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faPlus, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faPenToSquare, faTrash, faUserShield } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { StaffMember } from '../../types'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
 import CredentialsDialog, { Credential } from '../../components/ui/CredentialsDialog'
 import PasswordField from '../../components/ui/PasswordField'
+import { useAuth } from '../../contexts/AuthContext'
+import PermissionsDialog from './PermissionsDialog'
 
 const roleLabels: Record<string, string> = {
   director:    'Directeur',
@@ -35,6 +37,9 @@ export default function Staff() {
   const [deleteTarget, setDeleteTarget] = useState<StaffMember | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [newCredentials, setNewCredentials] = useState<Credential | null>(null)
+  const [permissionsTarget, setPermissionsTarget] = useState<StaffMember | null>(null)
+  // Gérer les permissions individuelles est réservé au directeur (jamais délégable)
+  const canManagePermissions = useAuth().user?.role === 'director'
 
   const load = async () => {
     setLoading(true)
@@ -117,6 +122,13 @@ export default function Staff() {
                     </TableCell>
                     <TableCell align="right">
                       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                        {canManagePermissions && s.role !== 'director' && (
+                          <Tooltip title="Permissions">
+                            <IconButton size="small" sx={{ color: ECOLIO_NAVY }} onClick={() => setPermissionsTarget(s)}>
+                              <FontAwesomeIcon icon={faUserShield} style={{ fontSize: '0.85rem' }} />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                         <Tooltip title="Modifier">
                           <IconButton size="small" sx={{ color: ECOLIO_BLUE }} onClick={() => { setSelected(s); setFormOpen(true) }}>
                             <FontAwesomeIcon icon={faPenToSquare} style={{ fontSize: '0.85rem' }} />
@@ -142,6 +154,9 @@ export default function Staff() {
 
       <CredentialsDialog open={!!newCredentials} credentials={newCredentials ? [newCredentials] : []}
         onClose={() => setNewCredentials(null)} />
+
+      <PermissionsDialog member={permissionsTarget} roleLabel={permissionsTarget ? roleLabels[permissionsTarget.role] || permissionsTarget.role : ''}
+        onClose={() => setPermissionsTarget(null)} />
 
       {/* Dialog confirmation suppression */}
       <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)} maxWidth="xs" fullWidth

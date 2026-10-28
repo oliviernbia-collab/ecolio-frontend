@@ -18,7 +18,9 @@ import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 const DRAWER_WIDTH = 240
 const COLLAPSED_WIDTH = 64
 
-type NavItem = { path: string; label: string; icon: any; roles: string[]; section: string }
+// perm : permission du module. Visible selon le rôle, sauf si le directeur a retiré cette permission
+// au membre du personnel, et visible aussi pour un membre à qui il l'a accordée individuellement.
+type NavItem = { path: string; label: string; icon: any; roles: string[]; section: string; perm?: string }
 
 const navItems: NavItem[] = [
   { path: '/accueil',        label: 'Accueil',          icon: faHouse,         section: 'Général',            roles: ['super_admin','director','teacher','parent','student','accountant','counselor','librarian','nurse','maintenance','secretary'] },
@@ -26,34 +28,34 @@ const navItems: NavItem[] = [
   { path: '/admin',          label: 'Plateforme',       icon: faGlobe,         section: 'Général',            roles: ['super_admin'] },
   { path: '/admin/users',    label: 'Utilisateurs',     icon: faUsersGear,     section: 'Général',            roles: ['super_admin'] },
 
-  { path: '/classes',         label: 'Classes',          icon: faChalkboard,    section: 'Pédagogie',          roles: ['super_admin','director','teacher','counselor','secretary'] },
-  { path: '/students',        label: 'Élèves',           icon: faUsers,         section: 'Pédagogie',          roles: ['super_admin','director','teacher','nurse','secretary'] },
-  { path: '/parents',         label: 'Parents',          icon: faUserGroup,     section: 'Pédagogie',          roles: ['super_admin','director'] },
-  { path: '/subjects',         label: 'Matières',         icon: faBookOpen,      section: 'Pédagogie',          roles: ['super_admin','director','teacher'] },
-  { path: '/grades',          label: 'Notes & Bulletins',icon: faChartLine,     section: 'Pédagogie',          roles: ['super_admin','director','teacher','parent','student'] },
-  { path: '/attendance',      label: 'Présences',        icon: faCalendarCheck, section: 'Pédagogie',          roles: ['super_admin','director','teacher','counselor'] },
-  { path: '/exams',           label: 'Examens',          icon: faFileSignature, section: 'Pédagogie',          roles: ['super_admin','director','teacher'] },
-  { path: '/schedule',        label: 'Emploi du temps',  icon: faCalendarDays,  section: 'Pédagogie',          roles: ['super_admin','director','teacher','student','counselor'] },
+  { path: '/classes',         label: 'Classes',          icon: faChalkboard,    section: 'Pédagogie',          roles: ['super_admin','director','teacher','counselor','secretary'], perm: 'classes.read' },
+  { path: '/students',        label: 'Élèves',           icon: faUsers,         section: 'Pédagogie',          roles: ['super_admin','director','teacher','nurse','secretary'], perm: 'students.read' },
+  { path: '/parents',         label: 'Parents',          icon: faUserGroup,     section: 'Pédagogie',          roles: ['super_admin','director'], perm: 'students.write' },
+  { path: '/subjects',         label: 'Matières',         icon: faBookOpen,      section: 'Pédagogie',          roles: ['super_admin','director','teacher'], perm: 'subjects.write' },
+  { path: '/grades',          label: 'Notes & Bulletins',icon: faChartLine,     section: 'Pédagogie',          roles: ['super_admin','director','teacher','parent','student'], perm: 'grades.read' },
+  { path: '/attendance',      label: 'Présences',        icon: faCalendarCheck, section: 'Pédagogie',          roles: ['super_admin','director','teacher','counselor'], perm: 'attendance.read' },
+  { path: '/exams',           label: 'Examens',          icon: faFileSignature, section: 'Pédagogie',          roles: ['super_admin','director','teacher'], perm: 'exams.write' },
+  { path: '/schedule',        label: 'Emploi du temps',  icon: faCalendarDays,  section: 'Pédagogie',          roles: ['super_admin','director','teacher','student','counselor'], perm: 'schedule.write' },
 
-  { path: '/staff',           label: 'Personnel',        icon: faIdBadge,       section: 'Personnel & RH',     roles: ['super_admin','director','secretary'] },
-  { path: '/staff-attendance',label: 'Pointages',        icon: faFingerprint,   section: 'Personnel & RH',     roles: ['super_admin','director','teacher','accountant','secretary','counselor','librarian','nurse','maintenance'] },
-  { path: '/payroll',         label: 'Paye',             icon: faMoneyBillWave, section: 'Personnel & RH',     roles: ['super_admin','director','accountant'] },
+  { path: '/staff',           label: 'Personnel',        icon: faIdBadge,       section: 'Personnel & RH',     roles: ['super_admin','director','secretary'], perm: 'staff.read' },
+  { path: '/staff-attendance',label: 'Pointages',        icon: faFingerprint,   section: 'Personnel & RH',     roles: ['super_admin','director','teacher','accountant','secretary','counselor','librarian','nurse','maintenance'], perm: 'staff_attendance.read' },
+  { path: '/payroll',         label: 'Paye',             icon: faMoneyBillWave, section: 'Personnel & RH',     roles: ['super_admin','director','accountant'], perm: 'payroll.read' },
 
-  { path: '/finance',         label: 'Finance',          icon: faWallet,        section: 'Finance & Services', roles: ['super_admin','director','accountant','parent'] },
-  { path: '/services',        label: 'Cantine & Transport', icon: faBus,       section: 'Finance & Services', roles: ['super_admin','director','secretary','accountant'] },
+  { path: '/finance',         label: 'Finance',          icon: faWallet,        section: 'Finance & Services', roles: ['super_admin','director','accountant','parent'], perm: 'finance.read' },
+  { path: '/services',        label: 'Cantine & Transport', icon: faBus,       section: 'Finance & Services', roles: ['super_admin','director','secretary','accountant'], perm: 'services.read' },
 
   { path: '/messages',        label: 'Messagerie',       icon: faEnvelope,      section: 'Communication',      roles: ['super_admin','director','teacher','parent','student','counselor','librarian','nurse','maintenance','secretary'] },
-  { path: '/sms',             label: 'Services SMS',     icon: faCommentSms,    section: 'Communication',      roles: ['super_admin','director','secretary'] },
-  { path: '/publications',    label: 'Publications',     icon: faNewspaper,     section: 'Communication',      roles: ['super_admin','director'] },
+  { path: '/sms',             label: 'Services SMS',     icon: faCommentSms,    section: 'Communication',      roles: ['super_admin','director','secretary'], perm: 'sms.send' },
+  { path: '/publications',    label: 'Publications',     icon: faNewspaper,     section: 'Communication',      roles: ['super_admin','director'], perm: 'publications.manage' },
 
-  { path: '/library',         label: 'Bibliothèque',     icon: faBook,          section: 'Ressources',         roles: ['super_admin','director','librarian','teacher','secretary'] },
-  { path: '/health',          label: 'Infirmerie',       icon: faBriefcaseMedical, section: 'Ressources',      roles: ['super_admin','director','nurse'] },
+  { path: '/library',         label: 'Bibliothèque',     icon: faBook,          section: 'Ressources',         roles: ['super_admin','director','librarian','teacher','secretary'], perm: 'library.read' },
+  { path: '/health',          label: 'Infirmerie',       icon: faBriefcaseMedical, section: 'Ressources',      roles: ['super_admin','director','nurse'], perm: 'health.read' },
 
-  { path: '/academic-years',  label: 'Années scolaires', icon: faGraduationCap, section: 'Administration',     roles: ['super_admin','director'] },
-  { path: '/top-students',    label: "Tableau d'honneur",icon: faTrophy,        section: 'Administration',     roles: ['super_admin','director'] },
-  { path: '/cards',           label: 'Cartes & Badges',  icon: faAddressCard,   section: 'Administration',     roles: ['super_admin','director','secretary'] },
-  { path: '/activity-log',    label: "Journal d'activité",icon: faClockRotateLeft, section: 'Administration',  roles: ['super_admin','director'] },
-  { path: '/settings',        label: 'Paramètres',       icon: faGear,          section: 'Administration',     roles: ['super_admin','director'] },
+  { path: '/academic-years',  label: 'Années scolaires', icon: faGraduationCap, section: 'Administration',     roles: ['super_admin','director'], perm: 'academic_years.write' },
+  { path: '/top-students',    label: "Tableau d'honneur",icon: faTrophy,        section: 'Administration',     roles: ['super_admin','director'], perm: 'top_students.manage' },
+  { path: '/cards',           label: 'Cartes & Badges',  icon: faAddressCard,   section: 'Administration',     roles: ['super_admin','director','secretary'], perm: 'cards.generate' },
+  { path: '/activity-log',    label: "Journal d'activité",icon: faClockRotateLeft, section: 'Administration',  roles: ['super_admin','director'], perm: 'activity_logs.view' },
+  { path: '/settings',        label: 'Paramètres',       icon: faGear,          section: 'Administration',     roles: ['super_admin','director'], perm: 'settings.write' },
 ]
 
 interface SidebarProps {
@@ -67,7 +69,12 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [search, setSearch] = useState('')
 
-  const visible = navItems.filter(n => n.roles.includes(user?.role || ''))
+  const visible = navItems.filter(n => {
+    const byRole = n.roles.includes(user?.role || '')
+    if (!n.perm) return byRole
+    if (user?.permissions_granted?.includes(n.perm)) return true
+    return byRole && !user?.permissions_revoked?.includes(n.perm)
+  })
 
   const grouped = useMemo(() => {
     const q = search.trim().toLowerCase()

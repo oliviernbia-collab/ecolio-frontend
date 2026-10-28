@@ -5,7 +5,7 @@ import {
   DialogActions, TextField, Autocomplete, Avatar, ToggleButtonGroup, ToggleButton, Divider
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faCommentSms, faUserGroup, faUsers, faSchool } from '@fortawesome/free-solid-svg-icons'
+import { faCommentSms, faUserGroup, faUsers, faSchool, faChildReaching, faPeopleRoof, faIdBadge } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
 import { SmsLog } from '../../types'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
@@ -19,6 +19,27 @@ const STATUS_CFG: Record<string, { label: string; color: string; bg: string }> =
 }
 const TRIGGER_LABELS: Record<string, string> = { manuel: 'Manuel', absence: 'Auto — absence', facture: 'Auto — facture' }
 const SMS_SEGMENT_LENGTH = 160
+
+type RecipientType = 'student' | 'parent' | 'staff'
+const RECIPIENT_TYPES: Array<{ id: RecipientType; label: string; icon: any; empty: string }> = [
+  { id: 'student', label: 'Élèves',    icon: faChildReaching, empty: 'Aucun élève joignable (ni numéro élève, ni numéro du parent)' },
+  { id: 'parent',  label: 'Parents',   icon: faPeopleRoof,    empty: 'Aucun parent avec un numéro de téléphone' },
+  { id: 'staff',   label: 'Personnel', icon: faIdBadge,       empty: 'Aucun membre du personnel avec un numéro de téléphone' },
+]
+// Les élèves (kind 'student') ne sont pas des comptes utilisateurs : leurs id peuvent recouper ceux des parents / du personnel
+const recipientKey = (u: any) => `${u.kind}-${u.id}`
+
+// Maternelle / primaire : SMS au parent ; secondaire : à l'élève s'il a un numéro, sinon au parent
+function studentTargetText(u: any) {
+  const cls = u.class_name || 'Sans classe'
+  if (u.target === 'student') return `${cls} · SMS à l'élève · ${u.phone}`
+  return `${cls} · SMS au parent ${u.parent_name} · ${u.phone}${u.own_phone_missing ? " (pas de numéro élève)" : ''}`
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  student: 'Élève', parent: 'Parent', director: 'Directeur', teacher: 'Enseignant', accountant: 'Comptable',
+  counselor: "Conseiller d'éducation", librarian: 'Bibliothécaire', nurse: 'Infirmier(e)', maintenance: 'Maintenance', secretary: 'Secrétariat',
+}
 
 export default function SMS() {
   const { showToast } = useToast()
@@ -113,23 +134,26 @@ function ComposeSmsDialog({ open, onClose, onSent }: { open: boolean; onClose: (
   const [selectedGroup, setSelectedGroup] = useState('')
   const [recipients, setRecipients] = useState<any[]>([])
   const [recipientSearch, setRecipientSearch] = useState('')
+  const [recipientType, setRecipientType] = useState<RecipientType>('parent')
   const [recipientOptions, setRecipientOptions] = useState<any[]>([])
   const [content, setContent] = useState('')
   const [sending, setSending] = useState(false)
 
   useEffect(() => {
     if (!open) return
-    setMode('group'); setSelectedGroup(''); setRecipients([]); setContent('')
+    setMode('group'); setSelectedGroup(''); setRecipients([]); setContent(''); setRecipientType('parent')
     api.get('/sms/groups').then(r => setGroups(r.data.data)).catch(() => {})
   }, [open])
 
   useEffect(() => {
     if (mode !== 'individual') return
     const t = setTimeout(() => {
-      api.get('/sms/recipients', { params: { q: recipientSearch } }).then(r => setRecipientOptions(r.data.data)).catch(() => {})
+      api.get('/sms/recipients', { params: { q: recipientSearch, type: recipientType } })
+        .then(r => setRecipientOptions(r.data.data.map((o: any) => ({ ...o, kind: o.kind || 'user' }))))
+        .catch(() => {})
     }, 300)
     return () => clearTimeout(t)
-  }, [recipientSearch, mode])
+  }, [recipientSearch, recipientType, mode])
 
   const handleSend = async () => {
     if (!content.trim()) { showToast('Le message est requis', 'warning'); return }
@@ -140,7 +164,11 @@ function ComposeSmsDialog({ open, onClose, onSent }: { open: boolean; onClose: (
     try {
       const payload = mode === 'group'
         ? { recipient_group: selectedGroup, content }
-        : { recipient_ids: recipients.map((u: any) => u.id), content }
+        : {
+            recipient_ids: recipients.filter((u: any) => u.kind === 'user').map((u: any) => u.id),
+            student_ids: recipients.filter((u: any) => u.kind === 'student').map((u: any) => u.id),
+            content,
+          }
       const r = await api.post('/sms', payload)
       onSent(r.data.sent, r.data.total)
       onClose()
@@ -198,23 +226,38 @@ function ComposeSmsDialog({ open, onClose, onSent }: { open: boolean; onClose: (
           )}
 
           {mode === 'individual' && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {/* Les destinataires déjà choisis restent sélectionnés quand on change de filtre */}
+            <ToggleButtonGroup value={recipientType} exclusive size="small" fullWidth color="primary"
+              onChange={(_, v) => { if (v) { setRecipientType(v); setRecipientOptions([]) } }}>
+              {RECIPIENT_TYPES.map(t => (
+                <ToggleButton key={t.id} value={t.id}>
+                  <FontAwesomeIcon icon={t.icon} style={{ marginRight: 6, fontSize: '0.85rem' }} />{t.label}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
             <Autocomplete multiple options={recipientOptions}
               value={recipients} onChange={(_, v) => setRecipients(v)}
               onInputChange={(_, v) => setRecipientSearch(v)}
               getOptionLabel={u => `${u.first_name} ${u.last_name}`}
-              isOptionEqualToValue={(o, v) => o.id === v.id}
-              noOptionsText="Tapez pour rechercher (numéro requis)…"
-              renderOption={(props, u) => (
-                <Box component="li" {...props} sx={{ gap: 1.5 }}>
+              isOptionEqualToValue={(o, v) => recipientKey(o) === recipientKey(v)}
+              getOptionKey={recipientKey}
+              filterOptions={x => x}
+              noOptionsText={recipientSearch ? 'Aucun résultat avec un numéro de téléphone' : RECIPIENT_TYPES.find(t => t.id === recipientType)!.empty}
+              renderOption={({ key, ...props }, u) => (
+                <Box component="li" key={key} {...props} sx={{ gap: 1.5 }}>
                   <Avatar sx={{ width: 28, height: 28, fontSize: '0.7rem', bgcolor: ECOLIO_NAVY }}>{u.first_name[0]}</Avatar>
                   <Box>
                     <Typography variant="body2">{u.first_name} {u.last_name}</Typography>
-                    <Typography variant="caption" color="text.secondary">{u.phone}</Typography>
+                    <Typography variant="caption" color={u.own_phone_missing ? 'warning.main' : 'text.secondary'}>
+                      {u.kind === 'student' ? studentTargetText(u) : `${ROLE_LABELS[u.role] || u.role} · ${u.phone}`}
+                    </Typography>
                   </Box>
                 </Box>
               )}
               renderInput={params => <TextField {...params} label="Destinataires" placeholder="Rechercher par nom…" />}
             />
+            </Box>
           )}
 
           {mode === 'group' && selectedGroupData && (

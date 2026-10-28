@@ -108,6 +108,8 @@ export interface Student {
   medical_notes?: string
   emergency_contact_name?: string
   emergency_contact_phone?: string
+  // Numéro propre de l'élève (optionnel) : reçoit les SMS au secondaire
+  phone?: string | null
   created_at: string
 }
 

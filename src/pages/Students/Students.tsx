@@ -64,7 +64,7 @@ function StudentForm({ open, onClose, student, classes, onSaved, onCredentials }
 
   const emptyStudent = {
     first_name: '', last_name: '', matricule: '', birth_date: '', birth_place: '', gender: 'M',
-    class_id: '', status: 'inscrit', address: '', emergency_contact_name: '',
+    class_id: '', status: 'inscrit', address: '', emergency_contact_name: '', phone: '',
     emergency_contact_phone: '', blood_type: '', medical_notes: '',
   }
 
@@ -233,6 +233,12 @@ function StudentForm({ open, onClose, student, classes, onSaved, onCredentials }
                 {Object.entries(statusText).map(([k, v]) => <MenuItem key={k} value={k}>{v}</MenuItem>)}
               </Select>
             </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField fullWidth label="Téléphone de l'élève (optionnel)" value={form.phone || ''} onChange={e => set('phone', e.target.value)}
+              helperText={classes.find(c => c.id === form.class_id)?.cycle === 'secondaire'
+                ? "Les SMS de l'école seront envoyés à ce numéro"
+                : 'Utilisé au secondaire ; en maternelle et primaire, les SMS vont au parent'} />
           </Grid>
 
           {/* ── Contact d'urgence ── */}

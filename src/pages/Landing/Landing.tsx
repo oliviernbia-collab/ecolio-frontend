@@ -19,11 +19,12 @@ import { useAuth } from '../../contexts/AuthContext'
 import SiteHeader from '../../components/Site/SiteHeader'
 import SiteFooter from '../../components/Site/SiteFooter'
 import BackToTop from '../../components/Site/BackToTop'
+import VoiceGuide from '../../components/VoiceGuide/VoiceGuide'
 
 const FEATURE_COLORS = ['#1A3C5E', '#2E86AB', '#16a34a', '#d97706', '#7c3aed', '#0ea5e9']
 
 const FEATURES = [
-  { icon: faUsers,          label: 'Élèves & inscriptions',      desc: 'Dossiers complets, matricules automatiques, suivi par classe.' },
+  { icon: faUsers,          label: 'Élèves & inscriptions',      desc: 'Dossiers complets avec matricule, suivi par classe.' },
   { icon: faChartLine,      label: 'Notes & bulletins',          desc: 'Saisie des notes, moyennes calculées, bulletins imprimables.' },
   { icon: faCalendarCheck,  label: 'Présences & emploi du temps',desc: "Appel numérique, détection de conflits d'horaires." },
   { icon: faWallet,         label: 'Finance & paye',             desc: 'Factures, paiements mobiles, bulletins de salaire du personnel.' },
@@ -466,6 +467,7 @@ export default function Landing() {
 
       <SiteFooter />
       <BackToTop />
+      <VoiceGuide />
     </Box>
   )
 }

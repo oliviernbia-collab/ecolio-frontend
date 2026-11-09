@@ -3,11 +3,12 @@ import {
   Box, Card, CardContent, Typography, Button, Grid, Chip, Avatar,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
   MenuItem, Select, FormControl, InputLabel, CircularProgress,
-  LinearProgress, IconButton, Tooltip, ToggleButtonGroup, ToggleButton, Divider
+  LinearProgress, IconButton, Tooltip, ToggleButtonGroup, ToggleButton, Divider, Menu, ListItemIcon, ListItemText
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
-import { faPlus, faPenToSquare, faTrash, faUsers, faChalkboard } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faPenToSquare, faTrash, faUsers, faChalkboard, faFileLines, faDownload, faPrint } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
+import { downloadFile, printPdf } from '../../lib/download'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import { useToast } from '../../contexts/ToastContext'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
@@ -44,6 +45,22 @@ export default function Classes() {
   const [selected, setSelected]  = useState<ClassItem | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<ClassItem | null>(null)
   const [deleting, setDeleting]  = useState(false)
+  // Menu « Liste de classe » (télécharger / imprimer) ouvert sur la carte d'une classe
+  const [listMenu, setListMenu]  = useState<{ anchor: HTMLElement; cls: ClassItem } | null>(null)
+  const [listBusy, setListBusy]  = useState(false)
+
+  const handleClassList = async (action: 'download' | 'print') => {
+    if (!listMenu) return
+    const { cls } = listMenu
+    setListMenu(null)
+    setListBusy(true)
+    try {
+      if (action === 'download') await downloadFile(`/classes/${cls.id}/list/pdf`, `liste-de-classe-${cls.name}.pdf`)
+      else await printPdf(`/classes/${cls.id}/list/pdf`)
+    } catch (e: any) {
+      showToast(e.response?.data?.message || 'Impossible de générer la liste de classe', 'error')
+    } finally { setListBusy(false) }
+  }
 
   const load = async () => {
     setLoading(true)
@@ -176,7 +193,13 @@ export default function Classes() {
                     </Box>
 
                     {/* Actions */}
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5, mt: 1.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1.5 }}>
+                      <Button size="small" variant="outlined" disabled={listBusy}
+                        startIcon={<FontAwesomeIcon icon={faFileLines} style={{ fontSize: '0.8rem' }} />}
+                        onClick={e => setListMenu({ anchor: e.currentTarget, cls })}
+                        sx={{ mr: 'auto', textTransform: 'none', fontWeight: 600, py: 0.25 }}>
+                        Liste de classe
+                      </Button>
                       <Tooltip title="Modifier">
                         <IconButton size="small" sx={{ color: ECOLIO_BLUE }}
                           onClick={() => { setSelected(cls); setFormOpen(true) }}>
@@ -197,6 +220,17 @@ export default function Classes() {
           })}
         </Grid>
       )}
+
+      <Menu anchorEl={listMenu?.anchor} open={!!listMenu} onClose={() => setListMenu(null)}>
+        <MenuItem onClick={() => handleClassList('download')}>
+          <ListItemIcon><FontAwesomeIcon icon={faDownload} style={{ fontSize: '0.85rem' }} /></ListItemIcon>
+          <ListItemText primary="Télécharger (PDF)" />
+        </MenuItem>
+        <MenuItem onClick={() => handleClassList('print')}>
+          <ListItemIcon><FontAwesomeIcon icon={faPrint} style={{ fontSize: '0.85rem' }} /></ListItemIcon>
+          <ListItemText primary="Imprimer" />
+        </MenuItem>
+      </Menu>
 
       {/* Formulaire */}
       <ClassForm

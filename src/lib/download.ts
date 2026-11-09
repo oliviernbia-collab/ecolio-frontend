@@ -17,3 +17,25 @@ export async function downloadFile(url: string, fallbackFilename: string) {
   link.remove()
   window.URL.revokeObjectURL(blobUrl)
 }
+
+// Imprime un PDF servi par une route API protégée : il est chargé dans un cadre invisible
+// puis la boîte d'impression du navigateur s'ouvre (choix de l'imprimante ou « Enregistrer en PDF »).
+export async function printPdf(url: string) {
+  const res = await api.get(url, { responseType: 'blob' })
+  const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+  const frame = document.createElement('iframe')
+  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'
+  frame.src = blobUrl
+  frame.onload = () => {
+    try {
+      frame.contentWindow?.focus()
+      frame.contentWindow?.print()
+    } catch {
+      // Navigateurs qui n'impriment pas un PDF dans un cadre (certains mobiles) : on l'ouvre.
+      window.open(blobUrl, '_blank')
+    }
+    // Le cadre reste le temps que la boîte d'impression lise le document.
+    setTimeout(() => { frame.remove(); window.URL.revokeObjectURL(blobUrl) }, 60_000)
+  }
+  document.body.appendChild(frame)
+}

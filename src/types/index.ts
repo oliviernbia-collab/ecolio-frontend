@@ -102,6 +102,8 @@ export interface Student {
   parent_name?: string
   parent_phone?: string
   parent_email?: string
+  // Email de connexion du compte élève (absent si l'élève n'a pas de compte)
+  student_login_email?: string | null
   status: 'pre_inscrit' | 'inscrit' | 'reinscrit' | 'archive'
   address?: string
   blood_type?: string

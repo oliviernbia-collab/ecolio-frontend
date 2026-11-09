@@ -6,9 +6,12 @@ import {
 import { FontAwesomeIcon } from '../../lib/icons'
 import {
   faMagnifyingGlass, faChevronDown, faChevronUp, faUserGroup,
-  faPhone, faEnvelope, faGraduationCap
+  faPhone, faEnvelope, faGraduationCap, faKey
 } from '@fortawesome/free-solid-svg-icons'
 import api from '../../lib/axios'
+import { useToast } from '../../contexts/ToastContext'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import CredentialsDialog, { Credential } from '../../components/ui/CredentialsDialog'
 import { ECOLIO_NAVY, ECOLIO_BLUE } from '../../theme'
 import EmptyState from '../../components/ui/EmptyState'
 
@@ -28,6 +31,7 @@ interface ChildInfo {
   class_name?: string
   status: string
   photo_url?: string
+  student_login_email?: string | null
 }
 
 interface ParentWithChildren extends ParentUser {
@@ -41,7 +45,7 @@ const statusColors: Record<string, { bg: string; color: string; label: string }>
   archive:    { bg: '#f3f4f6', color: '#6b7280', label: 'Archivé' },
 }
 
-function ParentCard({ parent }: { parent: ParentWithChildren }) {
+function ParentCard({ parent, onReset }: { parent: ParentWithChildren; onReset: (p: ParentWithChildren) => void }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -61,9 +65,9 @@ function ParentCard({ parent }: { parent: ParentWithChildren }) {
             </Typography>
             <Box sx={{ display: 'flex', gap: 2, mt: 0.3, flexWrap: 'wrap' }}>
               {parent.email && (
-                <Typography fontSize="0.78rem" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography fontSize="0.78rem" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, wordBreak: 'break-all' }}>
                   <FontAwesomeIcon icon={faEnvelope} style={{ fontSize: '0.7rem' }} />
-                  {parent.email}
+                  Identifiant : {parent.email}
                 </Typography>
               )}
               {parent.phone && (
@@ -76,6 +80,12 @@ function ParentCard({ parent }: { parent: ParentWithChildren }) {
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+            <Tooltip title="Réinitialiser le mot de passe">
+              <IconButton size="small" sx={{ color: ECOLIO_NAVY }} aria-label={`Réinitialiser le mot de passe de ${parent.first_name} ${parent.last_name}`}
+                onClick={e => { e.stopPropagation(); onReset(parent) }}>
+                <FontAwesomeIcon icon={faKey} style={{ fontSize: '0.8rem' }} />
+              </IconButton>
+            </Tooltip>
             <Chip
               icon={<FontAwesomeIcon icon={faGraduationCap} style={{ fontSize: '0.7rem' }} />}
               label={`${parent.children.length} enfant${parent.children.length > 1 ? 's' : ''}`}
@@ -117,6 +127,11 @@ function ParentCard({ parent }: { parent: ParentWithChildren }) {
                             <Typography fontSize="0.7rem" color="text.secondary">— {child.class_name}</Typography>
                           )}
                         </Box>
+                        {child.student_login_email && (
+                          <Typography fontSize="0.68rem" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+                            Identifiant : {child.student_login_email}
+                          </Typography>
+                        )}
                       </Box>
                       <Chip label={sc.label} size="small" sx={{ bgcolor: sc.bg, color: sc.color, fontSize: '0.65rem', height: 20 }} />
                     </Box>
@@ -136,6 +151,22 @@ export default function Parents() {
   const [students, setStudents] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const { showToast } = useToast()
+  const [toReset, setToReset] = useState<ParentWithChildren | null>(null)
+  const [resetting, setResetting] = useState(false)
+  const [credentials, setCredentials] = useState<Credential[]>([])
+
+  const handleReset = async () => {
+    if (!toReset) return
+    setResetting(true)
+    try {
+      const r = await api.post(`/students/parents/${toReset.id}/reset-password`)
+      showToast('Mot de passe réinitialisé', 'success')
+      setCredentials([{ label: `Compte parent — ${toReset.first_name} ${toReset.last_name}`, ...r.data.credentials }])
+    } catch (e: any) {
+      showToast(e.response?.data?.message || 'Impossible de réinitialiser le mot de passe', 'error')
+    } finally { setResetting(false); setToReset(null) }
+  }
 
   useEffect(() => {
     Promise.all([
@@ -158,6 +189,7 @@ export default function Parents() {
         class_name: s.class_name,
         status: s.status,
         photo_url: s.photo_url,
+        student_login_email: s.student_login_email,
       })),
     }))
   }, [parents, students])
@@ -213,8 +245,21 @@ export default function Parents() {
           subtitle={search ? 'Essayez un autre terme.' : 'Les parents sont créés lors de l\'inscription des élèves.'}
         />
       ) : (
-        filtered.map(parent => <ParentCard key={parent.id} parent={parent} />)
+        filtered.map(parent => <ParentCard key={parent.id} parent={parent} onReset={setToReset} />)
       )}
+
+      <ConfirmDialog
+        open={!!toReset}
+        title="Réinitialiser le mot de passe"
+        message={`Générer un nouveau mot de passe temporaire pour ${toReset?.first_name} ${toReset?.last_name} ? L'ancien ne fonctionnera plus.`}
+        confirmLabel="Réinitialiser"
+        variant="warning"
+        loading={resetting}
+        onConfirm={handleReset}
+        onCancel={() => setToReset(null)}
+      />
+
+      <CredentialsDialog open={credentials.length > 0} credentials={credentials} onClose={() => setCredentials([])} />
     </Box>
   )
 }

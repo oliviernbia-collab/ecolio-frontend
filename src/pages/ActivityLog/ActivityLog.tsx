@@ -17,6 +17,8 @@ const ACTION_META: Record<string, { label: string; bg: string; color: string }> 
   login_failed:     { label: 'Connexion échouée',    bg: '#fee2e2', color: '#dc2626' },
   logout:           { label: 'Déconnexion',          bg: '#f1f5f9', color: '#64748b' },
   password_change:  { label: 'Mot de passe',         bg: '#e0f2fe', color: '#0369a1' },
+  password_reset:   { label: 'Réinitialisation MDP', bg: '#e0f2fe', color: '#0369a1' },
+  password_reset_failed: { label: 'Réinitialisation échouée', bg: '#fee2e2', color: '#dc2626' },
   create:           { label: 'Création',             bg: '#dbeafe', color: '#1e40af' },
   update:           { label: 'Modification',         bg: '#fef3c7', color: '#b45309' },
   delete:           { label: 'Suppression',          bg: '#fee2e2', color: '#dc2626' },

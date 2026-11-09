@@ -18,6 +18,7 @@ import SkeletonTable from '../../components/ui/SkeletonTable'
 import EmptyState from '../../components/ui/EmptyState'
 import DataTablePagination from '../../components/ui/DataTablePagination'
 import CredentialsDialog, { Credential } from '../../components/ui/CredentialsDialog'
+import LoginAccountsDialog from './LoginAccountsDialog'
 
 const statusColors: Record<string, string> = {
   inscrit: '#dcfce7', pre_inscrit: '#fef9c3', reinscrit: '#dbeafe', archive: '#f3f4f6',
@@ -378,6 +379,7 @@ export default function Students() {
   const [formOpen, setFormOpen] = useState(false)
   const [selected, setSelected] = useState<Student | null>(null)
   const [toArchive, setToArchive] = useState<Student | null>(null)
+  const [accountsOf, setAccountsOf] = useState<Student | null>(null)
   const [newCredentials, setNewCredentials] = useState<Credential[]>([])
   const [archiving, setArchiving] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('last_name')
@@ -567,7 +569,13 @@ export default function Students() {
                           <Typography variant="caption" color="text.secondary">—</Typography>
                         )}
                       </TableCell>
-                      <TableCell align="right">
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        <Tooltip title="Identifiants de connexion">
+                          <IconButton size="small" sx={{ color: ECOLIO_NAVY }} onClick={() => setAccountsOf(s)}
+                            aria-label={`Identifiants de connexion de ${s.first_name} ${s.last_name}`}>
+                            <FontAwesomeIcon icon={faKey} style={{ fontSize: '0.85rem' }} />
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title="Modifier">
                           <IconButton size="small" sx={{ color: ECOLIO_BLUE }} onClick={() => { setSelected(s); setFormOpen(true) }}>
                             <FontAwesomeIcon icon={faPenToSquare} style={{ fontSize: '0.85rem' }} />
@@ -602,6 +610,8 @@ export default function Students() {
 
       <CredentialsDialog open={newCredentials.length > 0} credentials={newCredentials}
         onClose={() => setNewCredentials([])} />
+
+      <LoginAccountsDialog student={accountsOf} onClose={() => setAccountsOf(null)} onCredentials={setNewCredentials} />
 
       <ConfirmDialog
         open={!!toArchive}

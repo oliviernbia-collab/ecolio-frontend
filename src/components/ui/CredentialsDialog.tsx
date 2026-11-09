@@ -56,7 +56,7 @@ export default function CredentialsDialog({ open, credentials, onClose }: Props)
       </DialogTitle>
       <DialogContent sx={{ pb: 1 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          À transmettre à la personne concernée — ce mot de passe ne sera plus jamais affiché. Un changement sera exigé à la première connexion.
+          À transmettre à la personne concernée — ce mot de passe ne sera plus jamais affiché. Un changement sera exigé à la prochaine connexion.
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           {credentials.map((c, i) => <CredentialRow key={i} cred={c} />)}

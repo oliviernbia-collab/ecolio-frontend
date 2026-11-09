@@ -8,6 +8,7 @@ import {
   faGraduationCap, faBookOpen, faCalendarCheck, faCircleXmark, faArrowRight
 } from '@fortawesome/free-solid-svg-icons'
 import api from '../../../lib/axios'
+import { subjectAverages, generalAverage } from '../../../lib/averages'
 import { useNavigate } from 'react-router-dom'
 import { usePortalChild } from '../../../contexts/PortalChildContext'
 
@@ -36,9 +37,7 @@ export default function ParentDashboard() {
         ])
         const grades = g.data.data
         const att    = a.data.data
-        const avg    = grades.length
-          ? grades.reduce((s: number, x: any) => s + (x.value / x.max_value) * 20, 0) / grades.length
-          : null
+        const avg    = generalAverage(subjectAverages(grades))
         const presents = att.filter((a: any) => a.status === 'present').length
         const rate = att.length > 0 ? Math.round((presents / att.length) * 100) : 100
         stats[child.id] = { avg, absences: att.filter((a: any) => a.status === 'absent').length, rate }

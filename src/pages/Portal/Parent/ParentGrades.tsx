@@ -9,6 +9,7 @@ import api from '../../../lib/axios'
 import { usePortalChild } from '../../../contexts/PortalChildContext'
 import ChildSelector from './ChildSelector'
 import { Grade } from '../../../types'
+import { subjectAverages, generalAverage } from '../../../lib/averages'
 
 const PERIODS = [
   { value: '', label: 'Toutes les périodes' },
@@ -33,21 +34,8 @@ export default function ParentGrades() {
       .finally(() => setLoading(false))
   }, [selectedChild, period])
 
-  const bySubject = grades.reduce((acc, g) => {
-    const key = g.subject_name ?? 'Inconnue'
-    if (!acc[key]) acc[key] = { grades: [], coeff: g.coefficient ?? 1 }
-    acc[key].grades.push(g)
-    return acc
-  }, {} as Record<string, { grades: Grade[]; coeff: number }>)
-
-  const subjectList = Object.entries(bySubject).map(([name, data]) => {
-    const avg = data.grades.reduce((s, g) => s + (g.value / g.max_value) * 20, 0) / data.grades.length
-    return { name, grades: data.grades, coeff: data.coeff, avg }
-  }).sort((a, b) => a.name.localeCompare(b.name))
-
-  const generalAvg = subjectList.length
-    ? subjectList.reduce((s, sub) => s + sub.avg * sub.coeff, 0) / subjectList.reduce((s, sub) => s + sub.coeff, 0)
-    : null
+  const subjectList = subjectAverages(grades)
+  const generalAvg = generalAverage(subjectList)
 
   return (
     <Box>

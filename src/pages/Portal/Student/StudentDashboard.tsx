@@ -9,6 +9,7 @@ import {
   faClockRotateLeft, faGraduationCap
 } from '@fortawesome/free-solid-svg-icons'
 import api from '../../../lib/axios'
+import { subjectAverages as computeSubjectAverages, generalAverage } from '../../../lib/averages'
 import { useAuth } from '../../../contexts/AuthContext'
 import { format, parseISO } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -19,7 +20,7 @@ interface StudentInfo {
 }
 
 interface GradeRow {
-  subject_name: string; value: number; max_value: number
+  subject_name: string; value: number; max_value: number; coefficient?: number
   period: string; grade_type: string; created_at: string
 }
 
@@ -54,17 +55,9 @@ export default function StudentDashboard() {
     ? Math.round((attendance.filter(a => a.status === 'present').length / attendance.length) * 100)
     : 100
 
-  const subjectAverages = Object.values(
-    grades.reduce((acc, g) => {
-      if (!acc[g.subject_name]) acc[g.subject_name] = { name: g.subject_name, total: 0, count: 0, max: g.max_value }
-      acc[g.subject_name].total += g.value
-      acc[g.subject_name].count++
-      return acc
-    }, {} as Record<string, { name: string; total: number; count: number; max: number }>)
-  ).map(s => ({ ...s, avg: s.total / s.count })).sort((a, b) => b.avg - a.avg)
-
-  const generalAvg = subjectAverages.length
-    ? subjectAverages.reduce((s, x) => s + x.avg, 0) / subjectAverages.length : null
+  // Matières de la meilleure à la moins bonne moyenne
+  const subjectAverages = computeSubjectAverages(grades).sort((a, b) => b.avg - a.avg)
+  const generalAvg = generalAverage(subjectAverages)
 
   const statusColor = (s: string) =>
     s === 'present' ? '#2ecc71' : s === 'absent' ? '#e74c3c' : s === 'retard' ? '#f39c12' : '#6b7280'

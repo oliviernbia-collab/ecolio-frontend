@@ -41,9 +41,9 @@ export default function ParentFinance() {
       .finally(() => setLoading(false))
   }, [selectedChild])
 
-  const total   = invoices.reduce((s, i) => s + i.amount, 0)
-  const paid    = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0)
-  const pending = invoices.filter(i => i.status !== 'paid' && i.status !== 'cancelled').reduce((s, i) => s + i.amount, 0)
+  const total   = invoices.reduce((s, i) => s + Number(i.amount), 0)
+  const paid    = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.amount), 0)
+  const pending = invoices.filter(i => i.status !== 'paid' && i.status !== 'cancelled').reduce((s, i) => s + Number(i.amount), 0)
 
   const fmt = (v: number) => v.toLocaleString('fr-FR') + ' FCFA'
 
@@ -103,7 +103,7 @@ export default function ParentFinance() {
                               {inv.description && <Typography fontSize="0.75rem" color="text.secondary">{inv.description}</Typography>}
                             </TableCell>
                             <TableCell className="hide-xs">{TYPE_LABELS[inv.type] ?? inv.type}</TableCell>
-                            <TableCell><Typography fontWeight={600}>{fmt(inv.amount)}</Typography></TableCell>
+                            <TableCell><Typography fontWeight={600}>{fmt(Number(inv.amount))}</Typography></TableCell>
                             <TableCell className="hide-xs">
                               {inv.due_date ? format(parseISO(inv.due_date), 'dd MMM yyyy', { locale: fr }) : '—'}
                             </TableCell>

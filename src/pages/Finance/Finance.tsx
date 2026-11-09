@@ -4,7 +4,7 @@ import {
   TableHead, TableRow, TableSortLabel, Chip, IconButton, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, Grid, MenuItem, Select, FormControl,
   InputLabel, CircularProgress, Tooltip, InputAdornment, Avatar, Radio,
-  RadioGroup, FormControlLabel
+  RadioGroup, FormControlLabel, Autocomplete, createFilterOptions
 } from '@mui/material'
 import { FontAwesomeIcon } from '../../lib/icons'
 import {
@@ -479,9 +479,16 @@ export default function Finance() {
 }
 
 // ── Invoice Form ───────────────────────────────────────────────────────────────
+// Recherche d'élève sans tenir compte des accents ni de l'ordre nom/prénom, par matricule ou nom du parent.
+const filterStudents = createFilterOptions<any>({
+  stringify: s => `${s.last_name} ${s.first_name} ${s.first_name} ${s.last_name} ${s.matricule ?? ''} ${s.parent_name ?? ''}`,
+  limit: 100,
+})
+
 function InvoiceForm({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
   const { showToast } = useToast()
   const [students, setStudents] = useState<any[]>([])
+  const [classFilter, setClassFilter] = useState('')
   const [form, setForm] = useState<any>({ student_id: '', type: 'scolarite', description: '', amount: '', due_date: '' })
   const [saving, setSaving] = useState(false)
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }))
@@ -489,9 +496,23 @@ function InvoiceForm({ open, onClose, onSaved }: { open: boolean; onClose: () =>
   useEffect(() => {
     if (open) {
       setForm({ student_id: '', type: 'scolarite', description: '', amount: '', due_date: '' })
-      api.get('/students').then(r => setStudents(r.data.data)).catch(() => {})
+      setClassFilter('')
+      // Élèves actifs uniquement, classés par classe puis par nom (ordre des groupes de la liste)
+      api.get('/students').then(r => setStudents(
+        r.data.data
+          .filter((s: any) => s.status !== 'archive')
+          .sort((a: any, b: any) => (a.class_name ?? '~').localeCompare(b.class_name ?? '~') || a.last_name.localeCompare(b.last_name) || a.first_name.localeCompare(b.first_name))
+      )).catch(() => {})
     }
   }, [open])
+
+  const classOptions = useMemo(
+    () => [...new Set(students.map(s => s.class_name).filter(Boolean))] as string[],
+    [students])
+  const studentOptions = useMemo(
+    () => classFilter ? students.filter(s => s.class_name === classFilter) : students,
+    [students, classFilter])
+  const selectedStudent = students.find(s => s.id === form.student_id) ?? null
 
   const handleSave = async () => {
     if (!form.student_id || !form.amount) {
@@ -514,15 +535,44 @@ function InvoiceForm({ open, onClose, onSaved }: { open: boolean; onClose: () =>
       <DialogTitle>Nouvelle facture</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={4}>
             <FormControl fullWidth size="small">
-              <InputLabel>Élève *</InputLabel>
-              <Select value={form.student_id} onChange={e => set('student_id', e.target.value)} label="Élève *">
-                {students.map(s => (
-                  <MenuItem key={s.id} value={s.id}>{s.first_name} {s.last_name} ({s.matricule})</MenuItem>
-                ))}
+              <InputLabel id="invoice-class-label">Classe</InputLabel>
+              <Select value={classFilter} label="Classe" labelId="invoice-class-label"
+                onChange={e => {
+                  setClassFilter(e.target.value)
+                  if (e.target.value && selectedStudent?.class_name !== e.target.value) set('student_id', '')
+                }}>
+                <MenuItem value="">Toutes les classes</MenuItem>
+                {classOptions.map(c => <MenuItem key={c} value={c}>{c}</MenuItem>)}
               </Select>
             </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Autocomplete
+              size="small"
+              options={studentOptions}
+              value={selectedStudent}
+              onChange={(_, s) => set('student_id', s?.id ?? '')}
+              filterOptions={filterStudents}
+              groupBy={s => s.class_name || 'Sans classe'}
+              getOptionLabel={s => `${s.last_name.toUpperCase()} ${s.first_name} — ${s.matricule}`}
+              isOptionEqualToValue={(a, b) => a.id === b.id}
+              noOptionsText="Aucun élève trouvé"
+              renderOption={(props, s) => (
+                <li {...props} key={s.id}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2" fontWeight={600} noWrap>{s.last_name.toUpperCase()} {s.first_name}</Typography>
+                    <Typography variant="caption" color="text.secondary" noWrap display="block">
+                      {s.matricule}{s.class_name ? ` · ${s.class_name}` : ''}{s.parent_name ? ` · Parent : ${s.parent_name}` : ''}
+                    </Typography>
+                  </Box>
+                </li>
+              )}
+              renderInput={params => (
+                <TextField {...params} label="Élève *" placeholder="Nom, prénom, matricule ou parent…" />
+              )}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth size="small">
